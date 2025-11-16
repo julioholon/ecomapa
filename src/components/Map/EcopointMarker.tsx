@@ -14,7 +14,7 @@ interface EcopointMarkerProps {
   onClick?: () => void
 }
 
-function createCategoryIcon(emoji: string, color: string) {
+export function createCategoryIcon(emoji: string, color: string) {
   return L.divIcon({
     className: 'ecopoint-marker',
     html: `

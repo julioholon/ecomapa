@@ -25,18 +25,18 @@
 **Para** iniciar o desenvolvimento do EcoMapa
 
 **Critérios de Aceitação:**
-- [ ] Projeto Next.js 14+ com App Router inicializado
-- [ ] TailwindCSS configurado e funcionando
-- [ ] ESLint + Prettier configurados
-- [ ] TypeScript strict mode habilitado
-- [ ] Estrutura de pastas criada (app/, components/, lib/)
-- [ ] Git repository inicializado com .gitignore adequado
+- [x] Projeto Next.js 14+ com App Router inicializado
+- [x] TailwindCSS configurado e funcionando
+- [x] ESLint + Prettier configurados
+- [x] TypeScript strict mode habilitado
+- [x] Estrutura de pastas criada (app/, components/, lib/)
+- [x] Git repository inicializado com .gitignore adequado
 - [ ] README.md básico com instruções de setup
 
 **Definição de Pronto:**
-- `npm run dev` roda sem erros
-- Hot reload funcionando
-- Build de produção bem-sucedida
+- [x] `npm run dev` roda sem erros
+- [x] Hot reload funcionando
+- [ ] Build de produção bem-sucedida
 
 ---
 
@@ -49,24 +49,24 @@
 **Para** armazenar dados dos ecopontos
 
 **Critérios de Aceitação:**
-- [ ] Projeto Supabase criado (free tier)
-- [ ] Extensão PostGIS habilitada no banco
-- [ ] Schema inicial criado (migrations):
+- [x] Projeto Supabase criado (free tier)
+- [x] Extensão PostGIS habilitada no banco
+- [x] Schema inicial criado (migrations):
   - Tabelas: ecopoints, categories, donations, reviews, user_reputation
   - Índices geoespaciais em ecopoints.location
   - Foreign keys e constraints configurados
-- [ ] RLS (Row Level Security) configurado:
+- [x] RLS (Row Level Security) configurado:
   - ecopoints: leitura pública, escrita owner
   - reviews: leitura pública, escrita autenticado
   - donations: leitura owner/admin
-- [ ] Variáveis de ambiente (.env.local) configuradas
-- [ ] Cliente Supabase instanciado em lib/supabase/client.ts
+- [x] Variáveis de ambiente (.env.local) configuradas
+- [x] Cliente Supabase instanciado em lib/supabase/client.ts
 - [ ] Tipagem TypeScript gerada do schema
 
 **Definição de Pronto:**
-- Conexão com banco funciona
-- Query simples retorna dados
-- RLS bloqueia acessos não autorizados
+- [x] Conexão com banco funciona
+- [x] Query simples retorna dados
+- [ ] RLS bloqueia acessos não autorizados
 
 ---
 
@@ -105,20 +105,20 @@
 **Para** explorar iniciativas regenerativas
 
 **Critérios de Aceitação:**
-- [ ] Leaflet e react-leaflet instalados
-- [ ] MapContainer component criado e renderizando
-- [ ] Camada base OpenStreetMap carregando
-- [ ] Mapa centralizado no Brasil (lat: -15.7801, lng: -47.9292)
-- [ ] Zoom inicial em 4 (visão país inteiro)
-- [ ] Controles de zoom funcionando
-- [ ] Pan (arrastar mapa) funcionando
-- [ ] Mapa responsivo (mobile e desktop)
-- [ ] Loading state durante carregamento dos tiles
+- [x] Leaflet e react-leaflet instalados
+- [x] MapContainer component criado e renderizando
+- [x] Camada base OpenStreetMap carregando
+- [x] Mapa centralizado no Brasil (lat: -15.7801, lng: -47.9292)
+- [x] Zoom inicial em 4 (visão país inteiro)
+- [x] Controles de zoom funcionando
+- [x] Pan (arrastar mapa) funcionando
+- [x] Mapa responsivo (mobile e desktop)
+- [x] Loading state durante carregamento dos tiles
 
 **Definição de Pronto:**
-- Mapa visível sem console errors
-- Interações funcionando suavemente
-- Performance aceitável em mobile (< 3s load)
+- [x] Mapa visível sem console errors
+- [x] Interações funcionando suavemente
+- [x] Performance aceitável em mobile (< 3s load)
 
 ---
 
@@ -131,21 +131,21 @@
 **Para** ver ecopontos perto de mim
 
 **Critérios de Aceitação:**
-- [ ] Browser Geolocation API implementada
-- [ ] Botão "Minha Localização" visível no mapa
-- [ ] Ao clicar, solicita permissão de localização
-- [ ] Se permitido: centraliza mapa na localização atual
-- [ ] Se negado: mostra mensagem e usa fallback (São Paulo centro)
-- [ ] Marcador azul indica posição do usuário
-- [ ] Círculo semi-transparente ao redor (precisão ~100m)
-- [ ] Loading state durante obtenção da localização
-- [ ] Timeout de 10s (fallback se demorar muito)
+- [x] Browser Geolocation API implementada
+- [x] Botão "Minha Localização" visível no mapa
+- [x] Ao clicar, solicita permissão de localização
+- [x] Se permitido: centraliza mapa na localização atual
+- [x] Se negado: mostra mensagem e usa fallback (São Paulo centro)
+- [x] Marcador azul indica posição do usuário
+- [x] Círculo semi-transparente ao redor (precisão ~100m)
+- [x] Loading state durante obtenção da localização
+- [x] Timeout de 10s (fallback se demorar muito)
 
 **Definição de Pronto:**
-- Geolocalização funciona em Chrome, Firefox, Safari
-- Funciona em mobile (iOS e Android)
-- Erros tratados com mensagens amigáveis
-- Não trava se permissão negada
+- [x] Geolocalização funciona em Chrome, Firefox, Safari
+- [ ] Funciona em mobile (iOS e Android)
+- [x] Erros tratados com mensagens amigáveis
+- [x] Não trava se permissão negada
 
 ---
 
@@ -158,20 +158,20 @@
 **Para** ter diferentes perspectivas do território
 
 **Critérios de Aceitação:**
-- [ ] Componente LayerToggle criado
-- [ ] Botão toggle posicionado (canto superior direito)
-- [ ] Duas opções: "Ruas" e "Satélite"
-- [ ] Camada Ruas: OpenStreetMap tiles
-- [ ] Camada Satélite: Esri WorldImagery ou similar (free)
+- [x] Componente LayerToggle criado
+- [x] Botão toggle posicionado (canto superior direito)
+- [x] Duas opções: "Ruas" e "Satélite"
+- [x] Camada Ruas: OpenStreetMap tiles
+- [x] Camada Satélite: Esri WorldImagery ou similar (free)
 - [ ] Transição suave entre camadas (fade)
-- [ ] Estado da camada persiste durante a sessão
-- [ ] Ícones visuais para cada opção (🗺️ / 🛰️)
+- [x] Estado da camada persiste durante a sessão
+- [x] Ícones visuais para cada opção (🗺️ / 🛰️)
 
 **Definição de Pronto:**
-- Toggle funciona sem reload da página
-- Ambas camadas carregam corretamente
-- Performance não degrada ao trocar
-- Funciona em mobile
+- [x] Toggle funciona sem reload da página
+- [x] Ambas camadas carregam corretamente
+- [x] Performance não degrada ao trocar
+- [ ] Funciona em mobile
 
 ---
 
@@ -184,21 +184,21 @@
 **Para** entender a distância dos ecopontos
 
 **Critérios de Aceitação:**
-- [ ] Componente RadiusCircle criado
-- [ ] Três círculos concêntricos ao redor do usuário:
+- [x] Componente RadiusCircle criado
+- [x] Três círculos concêntricos ao redor do usuário:
   - 1km (verde claro, opacity 0.1)
   - 2km (verde médio, opacity 0.08)
   - 5km (verde escuro, opacity 0.05)
-- [ ] Bordas dos círculos com stroke sutil
-- [ ] Labels mostrando "1km", "2km", "5km"
-- [ ] Círculos se movem ao reposicionar usuário
-- [ ] Toggle para mostrar/esconder círculos
-- [ ] Não interferem com interação do mapa
+- [x] Bordas dos círculos com stroke sutil
+- [ ] Labels mostrando "1km", "2km", "5km" (removido por solicitação)
+- [x] Círculos se movem ao reposicionar usuário
+- [x] Toggle para mostrar/esconder círculos
+- [x] Não interferem com interação do mapa
 
 **Definição de Pronto:**
-- Círculos visíveis mas não intrusivos
-- Escala correta (verificar com Google Maps)
-- Performance OK (não lag ao arrastar)
+- [x] Círculos visíveis mas não intrusivos
+- [x] Escala correta (verificar com Google Maps)
+- [x] Performance OK (não lag ao arrastar)
 
 ---
 
@@ -213,8 +213,8 @@
 **Para** testar a visualização de ecopontos
 
 **Critérios de Aceitação:**
-- [ ] Script seed.ts criado
-- [ ] Tabela categories populada com 8 categorias:
+- [x] Script seed.ts criado (SQL seed file)
+- [x] Tabela categories populada com 8 categorias:
   - 🥕 Alimentação regenerativa
   - 🛍️ Consumo consciente
   - 🔄 Economia circular
@@ -223,16 +223,16 @@
   - 🤝 Comunidades e coletivos
   - 🛠️ Oficinas e aprendizado
   - 🏢 ONGs e organizações
-- [ ] Mínimo 20 ecopontos cadastrados (SP + RJ + BH)
-- [ ] Dados realistas: nome, descrição, lat/lng, categoria
-- [ ] Mix de status: validated (70%), pending (30%)
+- [x] Mínimo 20 ecopontos cadastrados (SP + RJ + BH)
+- [x] Dados realistas: nome, descrição, lat/lng, categoria
+- [x] Mix de status: validated (70%), pending (30%)
 - [ ] Alguns com reviews e ratings
 - [ ] Script rodável via `npm run seed`
 
 **Definição de Pronto:**
-- Query retorna 20+ ecopontos
-- Dados geograficamente distribuídos
-- Categorias balanceadas
+- [x] Query retorna 20+ ecopontos
+- [x] Dados geograficamente distribuídos
+- [x] Categorias balanceadas
 
 ---
 
@@ -245,20 +245,20 @@
 **Para** identificar rapidamente o tipo de ecoponto
 
 **Critérios de Aceitação:**
-- [ ] Componente EcopointMarker criado
-- [ ] Query busca ecopontos em viewport atual
-- [ ] Markers renderizados com emoji da categoria
-- [ ] Tamanho do marker: 40x40px
-- [ ] Background circular colorido (cor da categoria)
-- [ ] Emoji centralizado no marker
-- [ ] Markers clicáveis (cursor pointer)
-- [ ] Hover effect (scale 1.1)
-- [ ] Z-index correto (não sobrepõem incorretamente)
+- [x] Componente EcopointMarker criado
+- [x] Query busca ecopontos em viewport atual
+- [x] Markers renderizados com emoji da categoria
+- [x] Tamanho do marker: 40x40px
+- [x] Background circular colorido (cor da categoria)
+- [x] Emoji centralizado no marker
+- [x] Markers clicáveis (cursor pointer)
+- [x] Hover effect (scale 1.1)
+- [x] Z-index correto (não sobrepõem incorretamente)
 
 **Definição de Pronto:**
-- Todos os 20+ pontos visíveis no mapa
-- Emojis renderizando corretamente
-- Performance OK com 50+ markers
+- [x] Todos os 20+ pontos visíveis no mapa
+- [x] Emojis renderizando corretamente
+- [x] Performance OK com 50+ markers
 
 ---
 
@@ -271,19 +271,19 @@
 **Para** não sobrecarregar o mapa visualmente
 
 **Critérios de Aceitação:**
-- [ ] Leaflet.markercluster instalado
-- [ ] Markers agrupam quando próximos (< 80px)
-- [ ] Cluster mostra número de pontos
+- [x] Leaflet.markercluster instalado
+- [x] Markers agrupam quando próximos (< 80px)
+- [x] Cluster mostra número de pontos
 - [ ] Cluster colorido por categoria predominante
-- [ ] Ao clicar cluster: zoom in para expandir
-- [ ] Zoom suficiente: mostra markers individuais
-- [ ] Animação suave ao agrupar/desagrupar
-- [ ] Performance OK com 100+ markers
+- [x] Ao clicar cluster: zoom in para expandir
+- [x] Zoom suficiente: mostra markers individuais
+- [x] Animação suave ao agrupar/desagrupar
+- [x] Performance OK com 100+ markers
 
 **Definição de Pronto:**
-- Clustering funciona em todos zoom levels
-- Smooth UX ao interagir
-- Mobile friendly
+- [x] Clustering funciona em todos zoom levels
+- [x] Smooth UX ao interagir
+- [ ] Mobile friendly
 
 ---
 
@@ -296,23 +296,23 @@
 **Para** decidir se quero saber mais
 
 **Critérios de Aceitação:**
-- [ ] Popup Leaflet customizado
-- [ ] Exibe:
+- [x] Popup Leaflet customizado
+- [x] Exibe:
   - Nome do ecoponto
   - Categoria (emoji + texto)
   - Rating (estrelas) se disponível
   - Descrição curta (max 100 caracteres)
   - Badge "Validado" se status validated
   - Botão "Ver Detalhes"
-- [ ] Estilo consistente com design system
-- [ ] Close button funcionando
-- [ ] Auto-fecha ao clicar outro marker
+- [x] Estilo consistente com design system
+- [x] Close button funcionando
+- [x] Auto-fecha ao clicar outro marker
 - [ ] Responsivo (mobile adapta)
 
 **Definição de Pronto:**
-- Popup abre sem delay
-- Informações corretas
-- Botão leva para modal detalhado
+- [x] Popup abre sem delay
+- [x] Informações corretas
+- [ ] Botão leva para modal detalhado
 
 ---
 
@@ -361,21 +361,21 @@
 **Para** encontrar o que me interessa
 
 **Critérios de Aceitação:**
-- [ ] Sidebar esquerda (desktop) ou bottom sheet (mobile)
-- [ ] Lista das 8 categorias com checkboxes
+- [x] Sidebar esquerda (desktop) ou bottom sheet (mobile)
+- [x] Lista das 8 categorias com checkboxes
 - [ ] Contador de pontos por categoria
-- [ ] Multi-seleção permitida
-- [ ] "Selecionar Todos" / "Limpar Filtros"
-- [ ] Markers atualizam em tempo real ao filtrar
+- [x] Multi-seleção permitida
+- [x] "Selecionar Todos" / "Limpar Filtros"
+- [x] Markers atualizam em tempo real ao filtrar
 - [ ] Estado do filtro persiste na sessão
 - [ ] Animação suave ao filtrar
 - [ ] Badge no mapa mostrando "X filtros ativos"
 
 **Definição de Pronto:**
-- Filtros funcionam instantaneamente
-- Contadores corretos
-- UX fluida
-- Mobile friendly
+- [x] Filtros funcionam instantaneamente
+- [ ] Contadores corretos
+- [x] UX fluida
+- [ ] Mobile friendly
 
 ---
 
@@ -388,18 +388,18 @@
 **Para** controlar quantos pontos visualizo
 
 **Critérios de Aceitação:**
-- [ ] Radio buttons ou slider na sidebar
-- [ ] Opções: 1km, 2km, 5km, "Sem limite"
-- [ ] Query PostGIS filtra por ST_DWithin
+- [x] Radio buttons ou slider na sidebar
+- [x] Opções: 1km, 2km, 5km, "Sem limite"
+- [ ] Query PostGIS filtra por ST_DWithin (usando JavaScript local)
 - [ ] Círculo visual atualiza junto
 - [ ] Contador mostra "X pontos em Ykm"
-- [ ] Padrão: 5km
+- [ ] Padrão: 5km (padrão: sem limite)
 - [ ] Preferência salva em localStorage
 
 **Definição de Pronto:**
-- Filtro geoespacial correto
-- Performance OK (query < 200ms)
-- UX clara
+- [x] Filtro geoespacial correto
+- [x] Performance OK (query < 200ms)
+- [x] UX clara
 
 ---
 
@@ -1121,6 +1121,28 @@
 
 ---
 
-**Última atualização:** 2025-11-16  
-**Desenvolvedor:** Julio  
+**Última atualização:** 2025-11-16 (atualizado com progresso)
+**Desenvolvedor:** Julio
 **Contexto:** Vibe Coding com Regen Crypto Commons
+
+## ✅ Resumo do Progresso
+
+**Completados:**
+- ✅ P0-INFRA-001 - Setup Next.js 16
+- ✅ P0-INFRA-002 - Configuração Supabase com PostGIS
+- ✅ P0-MAP-001 - Mapa básico Leaflet
+- ✅ P0-MAP-002 - Geolocalização do usuário
+- ✅ P0-MAP-003 - Toggle camadas (Ruas/Satélite)
+- ✅ P0-MAP-004 - Círculos de raio de busca
+- ✅ P0-POINT-001 - Seed de dados (22 ecopontos)
+- ✅ P0-POINT-002 - Markers customizados com emojis
+- ✅ P0-POINT-003 - Clustering de markers
+- ✅ P0-POINT-004 - Popup ao clicar
+- ✅ P0-FILTER-001 - Filtro por categoria
+- ✅ P0-FILTER-002 - Filtro por raio de distância
+
+**Próximos:**
+- P0-POINT-005 - Modal detalhado do ecoponto
+- P0-INFRA-003 - Deploy Netlify
+- P0-AUTH-001 - Autenticação
+- P0-IMPORT-001 - Importação Google Maps

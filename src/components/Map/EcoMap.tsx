@@ -6,15 +6,88 @@ import LocationButton from '@/components/Map/LocationButton'
 import UserLocationMarker from '@/components/Map/UserLocationMarker'
 import LayerToggle from '@/components/Map/LayerToggle'
 import RadiusCircles from '@/components/Map/RadiusCircles'
-import EcopointMarker from '@/components/Map/EcopointMarker'
+import MarkerClusterGroup from '@/components/Map/MarkerClusterGroup'
+import { createCategoryIcon } from '@/components/Map/EcopointMarker'
+import CategoryFilter from '@/components/Filters/CategoryFilter'
+import RadiusFilter from '@/components/Filters/RadiusFilter'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { useEcopoints } from '@/hooks/useEcopoints'
+import { getPrimaryCategory, CATEGORY_MAP } from '@/lib/constants/categories'
+import { useMemo } from 'react'
 
 export default function EcoMap() {
   const { latitude, longitude, accuracy, error, loading, getCurrentPosition } = useGeolocation()
   const { ecopoints, loading: loadingEcopoints } = useEcopoints()
   const [showError, setShowError] = useState(false)
   const [showRadiusCircles, setShowRadiusCircles] = useState(true)
+  const [showFilters, setShowFilters] = useState(false)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(Object.keys(CATEGORY_MAP))
+  const [selectedRadius, setSelectedRadius] = useState<number | null>(null)
+
+  // Calculate distance between two points in km
+  const getDistanceKm = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const R = 6371 // Earth's radius in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180
+    const dLng = ((lng2 - lng1) * Math.PI) / 180
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    return R * c
+  }
+
+  // Filter ecopoints based on selected categories and radius
+  const filteredEcopoints = useMemo(() => {
+    const filtered = ecopoints.filter((point) => {
+      // Category filter - check if PRIMARY category (first one) is selected
+      const primaryCategory = point.category[0]
+      if (!primaryCategory || !selectedCategories.includes(primaryCategory)) return false
+
+      // Radius filter
+      if (selectedRadius && latitude && longitude) {
+        const distance = getDistanceKm(latitude, longitude, point.lat, point.lng)
+        if (distance > selectedRadius) return false
+      }
+
+      return true
+    })
+    return filtered
+  }, [ecopoints, selectedCategories, selectedRadius, latitude, longitude])
+
+  // Prepare markers data for clustering
+  const markersData = useMemo(() => {
+    return filteredEcopoints.map((point) => {
+      const primaryCat = getPrimaryCategory(point.category)
+      const icon = createCategoryIcon(primaryCat.icon, primaryCat.color)
+
+      const popupContent = `
+        <div style="min-width: 200px;">
+          <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 20px;">${primaryCat.icon}</span>
+            <h3 style="font-weight: 600; margin: 0;">${point.name}</h3>
+          </div>
+          <p style="margin-bottom: 8px; font-size: 12px; color: #666;">${primaryCat.name}</p>
+          ${point.description ? `<p style="margin-bottom: 8px; font-size: 14px; color: #374151;">${point.description.slice(0, 100)}...</p>` : ''}
+          ${
+            point.status === 'validated'
+              ? '<span style="display: inline-block; background: #d1fae5; color: #047857; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;">✓ Validado</span>'
+              : '<span style="display: inline-block; background: #fef3c7; color: #b45309; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;">⏳ Pendente</span>'
+          }
+        </div>
+      `
+
+      return {
+        id: point.id,
+        lat: point.lat,
+        lng: point.lng,
+        icon,
+        popupContent,
+      }
+    })
+  }, [filteredEcopoints])
 
   const handleLocationClick = () => {
     setShowError(false)
@@ -57,17 +130,7 @@ export default function EcoMap() {
             <RadiusCircles center={[latitude, longitude]} visible={showRadiusCircles} />
           </>
         )}
-        {ecopoints.map((point) => (
-          <EcopointMarker
-            key={point.id}
-            id={point.id}
-            name={point.name}
-            description={point.description}
-            category={point.category}
-            status={point.status}
-            position={[point.lat, point.lng]}
-          />
-        ))}
+        <MarkerClusterGroup key={`cluster-${filteredEcopoints.length}-${selectedRadius}-${selectedCategories.join(',')}`} markers={markersData} />
         <LayerToggle />
       </MapContainer>
 
@@ -81,11 +144,30 @@ export default function EcoMap() {
         </div>
       )}
 
-      {/* Ecopoints Counter */}
-      {!loadingEcopoints && ecopoints.length > 0 && (
-        <div className="absolute bottom-4 right-4 z-[1000] rounded-lg bg-white px-3 py-2 shadow-md">
-          <span className="text-sm font-medium">{ecopoints.length} ecopontos</span>
-        </div>
+
+      {/* Filter Toggle Button */}
+      <button
+        onClick={() => setShowFilters(!showFilters)}
+        className={`absolute right-4 top-16 z-[1000] rounded-lg bg-white px-3 py-2 shadow-md transition-all hover:bg-gray-50 ${
+          showFilters ? 'ring-2 ring-green-500' : ''
+        }`}
+        title="Filtros"
+      >
+        <span className="text-sm font-medium">
+          {showFilters ? '✕ Fechar' : '🔍 Filtros'}
+        </span>
+      </button>
+
+      {/* Filters Panel */}
+      {showFilters && (
+        <>
+          <CategoryFilter selectedCategories={selectedCategories} onChange={setSelectedCategories} />
+          <RadiusFilter
+            selectedRadius={selectedRadius}
+            onChange={setSelectedRadius}
+            hasLocation={!!(latitude && longitude)}
+          />
+        </>
       )}
 
       {/* Location Button */}
