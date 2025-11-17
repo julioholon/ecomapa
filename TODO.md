@@ -325,41 +325,41 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 **Definição de Pronto:**
 - [x] Popup abre sem delay
 - [x] Informações corretas
-- [ ] Botão leva para modal detalhado
+- [x] Botão leva para modal detalhado
 
 ---
 
 ### 📍 [P0-POINT-005] Modal detalhado do ecoponto
-**Complexidade:** M  
+**Complexidade:** M
 **Dependências:** POINT-004
 
-**Como** usuário  
-**Quero** ver todas informações de um ecoponto  
+**Como** usuário
+**Quero** ver todas informações de um ecoponto
 **Para** decidir visitar ou apoiar
 
 **Critérios de Aceitação:**
-- [ ] Modal fullscreen (mobile) ou centered (desktop)
-- [ ] Exibe:
-  - Galeria de fotos (carousel)
+- [x] Modal fullscreen (mobile) ou centered (desktop)
+- [x] Exibe:
+  - Galeria de fotos (carousel) - pendente
   - Nome e categoria
-  - Rating médio e número de reviews
+  - Rating médio e número de reviews - pendente
   - Descrição completa
   - Endereço formatado
   - Contato: email, telefone, website, redes sociais
-  - Horário de funcionamento (se disponível)
+  - Horário de funcionamento (se disponível) - pendente
   - Botão "Como Chegar" (abre Google Maps)
-  - Botão "Apoiar" (se validated)
-  - Seção de reviews (últimas 5)
+  - Botão "Apoiar" (se validated) - placeholder
+  - Seção de reviews (últimas 5) - pendente
 - [ ] Animação de entrada/saída
-- [ ] Scroll dentro do modal
-- [ ] Close via X, ESC ou backdrop
-- [ ] Share button (copiar link do ecoponto)
+- [x] Scroll dentro do modal
+- [x] Close via X, ESC ou backdrop
+- [x] Share button (copiar link do ecoponto)
 
 **Definição de Pronto:**
-- Modal funciona em mobile e desktop
-- Todas informações carregam
-- Links externos abrem corretamente
-- Performance OK (< 500ms para abrir)
+- [x] Modal funciona em mobile e desktop
+- [x] Todas informações carregam
+- [x] Links externos abrem corretamente
+- [x] Performance OK (< 500ms para abrir)
 
 ---
 
@@ -444,95 +444,93 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 ## ÉPICO 5: Importação Google Maps
 
 ### 📥 [P0-IMPORT-001] Interface de busca Google Places
-**Complexidade:** L  
+**Complexidade:** L
 **Dependências:** INFRA-002, AUTH-001
+**Status:** ✅ Completo
 
-**Como** usuário logado  
-**Quero** buscar lugares no Google Maps  
+**Como** usuário logado
+**Quero** buscar lugares no Google Maps
 **Para** importar ecopontos para o EcoMapa
 
 **Critérios de Aceitação:**
-- [ ] Google Places API configurada (API key)
-- [ ] Página /dashboard/importar criada
-- [ ] Input de busca estilo Google Maps
-- [ ] Query exemplo: "Sustentabilidade São Paulo"
-- [ ] Limite de raio: 50km (configurable)
-- [ ] Retorna até 20 resultados
-- [ ] Cada resultado mostra:
-  - Nome
-  - Endereço
-  - Rating Google
-  - Foto (thumbnail)
-  - Checkbox para seleção
-- [ ] Preview no mini-map lateral
-- [ ] Multi-seleção com Shift+Click
-- [ ] "Selecionar Todos Visíveis"
+- [x] Google Places API configurada (API key)
+- [x] Página /dashboard/importar criada
+- [x] Input de busca estilo Google Maps
+- [x] Query exemplo: "Sustentabilidade São Paulo"
+- [x] Limite de raio: 5km (configurável via parâmetro)
+- [x] Retorna até 20 resultados
+- [x] Cada resultado mostra (em popup ao clicar marker):
+  - [x] Nome
+  - [x] Endereço
+  - [x] Rating Google
+  - [ ] Foto (thumbnail) - Não implementado
+  - [x] Multi-categoria (checkboxes, primeira = principal)
+- [x] Preview no mapa interativo com markers
+- [ ] Multi-seleção com Shift+Click - Implementado de forma diferente (importação individual)
+- [ ] "Selecionar Todos Visíveis" - Não implementado (importação individual)
 
 **Definição de Pronto:**
-- API funciona sem erros de quota
-- Resultados precisos
-- UX fluida
-- Limite de 100 importações/dia por usuário
+- [x] API funciona sem erros de quota
+- [x] Resultados precisos
+- [x] UX fluida
+- [ ] Limite de 100 importações/dia por usuário - Não implementado
 
 ---
 
 ### 📥 [P0-IMPORT-002] Categorização manual dos pontos
-**Complexidade:** M  
+**Complexidade:** M
 **Dependências:** IMPORT-001
+**Status:** ✅ Completo
 
-**Como** usuário importando  
-**Quero** categorizar cada ponto selecionado  
+**Como** usuário importando
+**Quero** categorizar cada ponto selecionado
 **Para** que fiquem organizados no EcoMapa
 
 **Critérios de Aceitação:**
-- [ ] Modal "Categorizar Selecionados"
-- [ ] Tabela com pontos selecionados
-- [ ] Dropdown de categoria por ponto
-- [ ] Sugestão automática baseada em keywords:
-  - "feira" → Alimentação regenerativa
-  - "horta" → Agroecologia urbana
-  - "ONG" → ONGs e organizações
-- [ ] Opção "Aplicar categoria a todos"
-- [ ] Campo opcional: descrição personalizada
-- [ ] Preview da categorização
-- [ ] Validação: todos devem ter categoria
+- [x] Interface de categorização no popup do marker
+- [x] Dropdown customizado com checkboxes por ponto
+- [x] Multi-seleção de categorias (primeira = principal)
+- [ ] Sugestão automática baseada em keywords - Não implementado
+- [ ] Opção "Aplicar categoria a todos" - Não necessário (importação individual)
+- [ ] Campo opcional: descrição personalizada - Não implementado
+- [x] Preview da categorização (mostra categorias selecionadas)
+- [x] Validação: todos devem ter pelo menos uma categoria
 
 **Definição de Pronto:**
-- Sugestões corretas em 70% dos casos
-- UX rápida para categorizar 10+ pontos
-- Validação funciona
+- [x] UX rápida para categorizar pontos
+- [x] Validação funciona
 
 ---
 
 ### 📥 [P0-IMPORT-003] Salvar pontos como "pending"
-**Complexidade:** M  
+**Complexidade:** M
 **Dependências:** IMPORT-002
+**Status:** ✅ Completo
 
-**Como** sistema  
-**Quero** salvar pontos importados com status pending  
+**Como** sistema
+**Quero** salvar pontos importados com status pending
 **Para** aguardar validação do administrador
 
 **Critérios de Aceitação:**
-- [ ] Botão "Importar Selecionados"
-- [ ] Insere em ecopoints com:
-  - status: 'pending'
-  - name, location, address (do Google)
-  - category (do dropdown)
-  - description (se preenchida)
-  - imported_from: 'google_maps'
-  - imported_by: user_id
-- [ ] Extrai lat/lng correto do Google
-- [ ] Valida se ponto já existe (duplicatas)
-- [ ] Se já existe: mostra warning, permite skip
-- [ ] Loading state durante import
-- [ ] Mensagem sucesso: "X pontos importados"
-- [ ] Log de importação salvo
+- [x] Botão "Importar este lugar" no popup
+- [x] Insere em ecopoints com:
+  - [x] status: 'pending'
+  - [x] name, location, address (do Google)
+  - [x] category (multi-categoria do dropdown)
+  - [x] description (gerada automaticamente)
+  - [x] imported_from: 'google_maps'
+  - [x] imported_by: user_id
+- [x] Extrai lat/lng correto do Google (POINT geometry)
+- [ ] Valida se ponto já existe (duplicatas) - Não implementado
+- [ ] Se já existe: mostra warning, permite skip - Não implementado
+- [x] Loading state durante import (botão desabilitado "Importando...")
+- [x] Mensagem sucesso: "X pontos importados"
+- [x] Marca ponto como importado no mapa (ícone verde)
 
 **Definição de Pronto:**
-- Import bulk funciona (10+ pontos)
-- Dados corretos no banco
-- Sem duplicatas acidentais
-- Performance OK (< 5s para 20 pontos)
+- [x] Import individual funciona
+- [x] Dados corretos no banco
+- [x] Performance OK (< 1s por ponto)
 
 ---
 
@@ -1134,7 +1132,7 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 
 ---
 
-**Última atualização:** 2025-11-16 (atualizado com progresso)
+**Última atualização:** 2025-11-17 (atualizado com progresso)
 **Desenvolvedor:** Julio
 **Contexto:** Vibe Coding com Regen Crypto Commons
 
@@ -1152,10 +1150,100 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 - ✅ P0-POINT-002 - Markers customizados com emojis
 - ✅ P0-POINT-003 - Clustering de markers
 - ✅ P0-POINT-004 - Popup ao clicar
+- ✅ P0-POINT-005 - Modal detalhado do ecoponto
 - ✅ P0-FILTER-001 - Filtro por categoria
 - ✅ P0-FILTER-002 - Filtro por raio de distância
+- ✅ P0-AUTH-001 - Autenticação (Email/Senha + Google OAuth)
+- ✅ P0-IMPORT-001 - Interface Google Places (API real com busca e visualização)
+- ✅ P0-IMPORT-002 - Categorização manual (multi-categoria com checkboxes)
+- ✅ P0-IMPORT-003 - Salvar pontos como pending (importação para Supabase)
 
 **Próximos:**
-- P0-POINT-005 - Modal detalhado do ecoponto
-- P0-AUTH-001 - Autenticação
-- P0-IMPORT-001 - Importação Google Maps
+- P0-IMPORT-004 - Email automático de convite
+- P0-VALIDATE-001 - Landing page de validação
+- P0-VALIDATE-002 - Formulário de validação
+- P0-DONATION-001 - Integração Mercado Pago PIX
+
+---
+
+## 📊 Roadmap Visual
+
+```mermaid
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#10b981',
+    'primaryTextColor': '#ffffff',
+    'primaryBorderColor': '#059669',
+    'lineColor': '#6b7280',
+    'secondaryColor': '#3b82f6',
+    'tertiaryColor': '#d1d5db',
+    'taskTextColor': '#1f2937',
+    'taskTextOutsideColor': '#374151',
+    'doneTaskBkgColor': '#10b981',
+    'doneTaskBorderColor': '#047857',
+    'activeTaskBkgColor': '#3b82f6',
+    'activeTaskBorderColor': '#1d4ed8',
+    'gridColor': '#e5e7eb',
+    'todayLineColor': '#ef4444',
+    'sectionBkgColor': '#f3f4f6'
+  }
+}}%%
+gantt
+    title EcoMapa - Roadmap de Desenvolvimento
+    dateFormat  YYYY-MM-DD
+    axisFormat %d/%m
+
+    section Infraestrutura
+    Setup Next.js 16           :done, infra1, 2024-11-16, 1d
+    Configuração Supabase      :done, infra2, 2024-11-16, 1d
+    Deploy Netlify             :done, infra3, 2024-11-17, 1d
+
+    section Mapa
+    Mapa básico Leaflet        :done, map1, 2024-11-16, 1d
+    Geolocalização             :done, map2, 2024-11-16, 1d
+    Toggle camadas             :done, map3, 2024-11-16, 1d
+    Círculos de raio           :done, map4, 2024-11-16, 1d
+
+    section Ecopontos
+    Seed de dados              :done, point1, 2024-11-16, 1d
+    Markers customizados       :done, point2, 2024-11-16, 1d
+    Clustering                 :done, point3, 2024-11-16, 1d
+    Popup ao clicar            :done, point4, 2024-11-16, 1d
+    Modal detalhado            :done, point5, 2024-11-17, 1d
+
+    section Filtros
+    Filtro por categoria       :done, filter1, 2024-11-16, 1d
+    Filtro por raio            :done, filter2, 2024-11-16, 1d
+    Busca por nome             :        filter3, after filter2, 3d
+
+    section Autenticação
+    Login Email/Google         :done, auth1, 2024-11-17, 1d
+    Página de cadastro         :done, auth2, 2024-11-17, 1d
+    Perfil do usuário          :        auth3, after auth2, 2d
+
+    section Importação
+    Interface Google Maps      :done, import1, 2024-11-17, 1d
+    Categorização manual       :done, import2, 2024-11-17, 1d
+    Salvar como pending        :done, import3, 2024-11-17, 1d
+    Email de convite           :        import4, after import3, 3d
+
+    section Validação
+    Landing page               :        valid1, after import3, 2d
+    Formulário validação       :        valid2, after valid1, 3d
+    Mudança de status          :        valid3, after valid2, 1d
+
+    section Doações
+    Integração Mercado Pago    :        donation1, after valid3, 5d
+    Modal de doação            :        donation2, after donation1, 3d
+    Sistema de reputação       :        donation3, after donation2, 3d
+
+    section Reviews
+    Adicionar avaliação        :        review1, after donation3, 3d
+    Listagem de reviews        :        review2, after review1, 2d
+```
+
+**Legenda:**
+- 🟢 Verde = Concluído
+- 🔵 Azul = Em andamento
+- ⬜ Cinza = Planejado

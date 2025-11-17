@@ -10,8 +10,9 @@ import MarkerClusterGroup from '@/components/Map/MarkerClusterGroup'
 import { createCategoryIcon } from '@/components/Map/EcopointMarker'
 import CategoryFilter from '@/components/Filters/CategoryFilter'
 import RadiusFilter from '@/components/Filters/RadiusFilter'
+import DetailModal from '@/components/Ecopoint/DetailModal'
 import { useGeolocation } from '@/hooks/useGeolocation'
-import { useEcopoints } from '@/hooks/useEcopoints'
+import { useEcopoints, EcopointLocation } from '@/hooks/useEcopoints'
 import { getPrimaryCategory, CATEGORY_MAP } from '@/lib/constants/categories'
 import { useMemo } from 'react'
 
@@ -24,6 +25,7 @@ export default function EcoMap() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(Object.keys(CATEGORY_MAP))
   const [selectedRadius, setSelectedRadius] = useState<number | null>(null)
   const [currentLayer, setCurrentLayer] = useState<LayerType>('streets')
+  const [selectedEcopoint, setSelectedEcopoint] = useState<EcopointLocation | null>(null)
 
   // Calculate distance between two points in km
   const getDistanceKm = (lat1: number, lng1: number, lat2: number, lng2: number) => {
@@ -77,6 +79,12 @@ export default function EcoMap() {
               ? '<span style="display: inline-block; background: #d1fae5; color: #047857; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;">✓ Validado</span>'
               : '<span style="display: inline-block; background: #fef3c7; color: #b45309; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;">⏳ Pendente</span>'
           }
+          <button
+            onclick="window.dispatchEvent(new CustomEvent('openEcopointDetail', { detail: '${point.id}' }))"
+            style="display: block; width: 100%; margin-top: 12px; padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer;"
+          >
+            Ver Detalhes
+          </button>
         </div>
       `
 
@@ -105,6 +113,20 @@ export default function EcoMap() {
       return () => clearTimeout(timer)
     }
   }, [error, loading])
+
+  // Listen for ecopoint detail open event from popup button
+  useEffect(() => {
+    const handleOpenDetail = (e: CustomEvent<string>) => {
+      const ecopointId = e.detail
+      const ecopoint = ecopoints.find((p) => p.id === ecopointId)
+      if (ecopoint) {
+        setSelectedEcopoint(ecopoint)
+      }
+    }
+
+    window.addEventListener('openEcopointDetail', handleOpenDetail as EventListener)
+    return () => window.removeEventListener('openEcopointDetail', handleOpenDetail as EventListener)
+  }, [ecopoints])
 
   return (
     <div className="relative h-full w-full">
@@ -192,6 +214,9 @@ export default function EcoMap() {
           </span>
         </button>
       )}
+
+      {/* Detail Modal */}
+      <DetailModal ecopoint={selectedEcopoint} onClose={() => setSelectedEcopoint(null)} />
     </div>
   )
 }

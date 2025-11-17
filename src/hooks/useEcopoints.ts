@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
-interface EcopointLocation {
+export interface EcopointLocation {
   id: string
   name: string
   description: string | null
@@ -12,6 +12,11 @@ interface EcopointLocation {
   status: string
   lat: number
   lng: number
+  address?: string | null
+  phone?: string | null
+  website?: string | null
+  instagram?: string | null
+  facebook?: string | null
 }
 
 interface EcopointRow {
