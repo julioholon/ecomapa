@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useMap } from 'react-leaflet'
 import L from 'leaflet'
 
-type LayerType = 'streets' | 'satellite'
+export type LayerType = 'streets' | 'satellite'
 
 const LAYERS = {
   streets: {
@@ -19,7 +19,11 @@ const LAYERS = {
   },
 }
 
-export default function LayerToggle() {
+interface LayerToggleProps {
+  onLayerChange?: (layer: LayerType) => void
+}
+
+export default function LayerToggle({ onLayerChange }: LayerToggleProps) {
   const map = useMap()
   const [activeLayer, setActiveLayer] = useState<LayerType>('streets')
 
@@ -41,6 +45,7 @@ export default function LayerToggle() {
     }).addTo(map)
 
     setActiveLayer(layerType)
+    onLayerChange?.(layerType)
   }
 
   return (

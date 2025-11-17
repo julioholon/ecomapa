@@ -1,12 +1,11 @@
 'use client'
 
 import { useEffect } from 'react'
-import { Marker, Circle, useMap } from 'react-leaflet'
+import { Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
 
 interface UserLocationMarkerProps {
   position: [number, number]
-  accuracy?: number | null
   flyTo?: boolean
 }
 
@@ -29,7 +28,6 @@ const userIcon = L.divIcon({
 
 export default function UserLocationMarker({
   position,
-  accuracy,
   flyTo = true,
 }: UserLocationMarkerProps) {
   const map = useMap()
@@ -42,21 +40,5 @@ export default function UserLocationMarker({
     }
   }, [map, position, flyTo])
 
-  return (
-    <>
-      <Marker position={position} icon={userIcon} />
-      {accuracy && (
-        <Circle
-          center={position}
-          radius={accuracy}
-          pathOptions={{
-            color: '#3B82F6',
-            fillColor: '#3B82F6',
-            fillOpacity: 0.1,
-            weight: 1,
-          }}
-        />
-      )}
-    </>
-  )
+  return <Marker position={position} icon={userIcon} />
 }

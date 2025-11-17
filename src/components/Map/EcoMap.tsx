@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import MapContainer from '@/components/Map/MapContainer'
 import LocationButton from '@/components/Map/LocationButton'
 import UserLocationMarker from '@/components/Map/UserLocationMarker'
-import LayerToggle from '@/components/Map/LayerToggle'
+import LayerToggle, { type LayerType } from '@/components/Map/LayerToggle'
 import RadiusCircles from '@/components/Map/RadiusCircles'
 import MarkerClusterGroup from '@/components/Map/MarkerClusterGroup'
 import { createCategoryIcon } from '@/components/Map/EcopointMarker'
@@ -16,13 +16,14 @@ import { getPrimaryCategory, CATEGORY_MAP } from '@/lib/constants/categories'
 import { useMemo } from 'react'
 
 export default function EcoMap() {
-  const { latitude, longitude, accuracy, error, loading, getCurrentPosition } = useGeolocation()
+  const { latitude, longitude, error, loading, getCurrentPosition } = useGeolocation()
   const { ecopoints, loading: loadingEcopoints } = useEcopoints()
   const [showError, setShowError] = useState(false)
   const [showRadiusCircles, setShowRadiusCircles] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<string[]>(Object.keys(CATEGORY_MAP))
   const [selectedRadius, setSelectedRadius] = useState<number | null>(null)
+  const [currentLayer, setCurrentLayer] = useState<LayerType>('streets')
 
   // Calculate distance between two points in km
   const getDistanceKm = (lat1: number, lng1: number, lat2: number, lng2: number) => {
@@ -126,12 +127,12 @@ export default function EcoMap() {
       <MapContainer>
         {latitude && longitude && (
           <>
-            <UserLocationMarker position={[latitude, longitude]} accuracy={accuracy} />
-            <RadiusCircles center={[latitude, longitude]} visible={showRadiusCircles} />
+            <UserLocationMarker position={[latitude, longitude]} />
+            <RadiusCircles center={[latitude, longitude]} visible={showRadiusCircles} isSatellite={currentLayer === 'satellite'} />
           </>
         )}
         <MarkerClusterGroup key={`cluster-${filteredEcopoints.length}-${selectedRadius}-${selectedCategories.join(',')}`} markers={markersData} />
-        <LayerToggle />
+        <LayerToggle onLayerChange={setCurrentLayer} />
       </MapContainer>
 
       {/* Loading Ecopoints Indicator */}

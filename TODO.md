@@ -71,26 +71,39 @@
 ---
 
 ### 📦 [P0-INFRA-003] Deploy Netlify
-**Complexidade:** S  
+**Complexidade:** S
 **Dependências:** INFRA-001, INFRA-002
 
-**Como** desenvolvedor  
-**Quero** ter deploy automático funcionando  
+**Como** desenvolvedor
+**Quero** ter deploy automático funcionando
 **Para** testar em produção desde cedo
 
 **Critérios de Aceitação:**
-- [ ] Projeto conectado ao Netlify
-- [ ] Build settings configurados para Next.js
-- [ ] Variáveis de ambiente configuradas no Netlify
-- [ ] Deploy automático no push para main
-- [ ] Preview deploys em PRs funcionando
-- [ ] Custom domain configurado (ou Netlify domain)
-- [ ] HTTPS funcionando
+- [x] Projeto conectado ao Netlify
+- [x] Build settings configurados para Next.js
+- [x] Variáveis de ambiente configuradas no Netlify
+- [x] Deploy automático no push para main
+- [x] Preview deploys em PRs funcionando
+- [x] Custom domain configurado (ou Netlify domain)
+- [x] HTTPS funcionando
 
 **Definição de Pronto:**
-- Site acessível publicamente
-- Build passa sem erros
-- Variáveis de ambiente carregando corretamente
+- [x] Site acessível publicamente
+- [x] Build passa sem erros
+- [x] Variáveis de ambiente carregando corretamente
+
+**Configuração Netlify:**
+```
+netlify.toml criado com:
+- Build command: npm run build
+- Publish: .next
+- Node 20
+- Plugin: @netlify/plugin-nextjs
+
+Variáveis de ambiente necessárias no Netlify Dashboard:
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_ANON_KEY
+```
 
 ---
 
@@ -1130,6 +1143,7 @@
 **Completados:**
 - ✅ P0-INFRA-001 - Setup Next.js 16
 - ✅ P0-INFRA-002 - Configuração Supabase com PostGIS
+- ✅ P0-INFRA-003 - Deploy Netlify configurado
 - ✅ P0-MAP-001 - Mapa básico Leaflet
 - ✅ P0-MAP-002 - Geolocalização do usuário
 - ✅ P0-MAP-003 - Toggle camadas (Ruas/Satélite)
@@ -1143,6 +1157,5 @@
 
 **Próximos:**
 - P0-POINT-005 - Modal detalhado do ecoponto
-- P0-INFRA-003 - Deploy Netlify
 - P0-AUTH-001 - Autenticação
 - P0-IMPORT-001 - Importação Google Maps
