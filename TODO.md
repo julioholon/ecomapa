@@ -838,42 +838,43 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 
 ## ÉPICO 9: Micro-doações
 
-### 💰 [P0-DONATION-001] Integração Mercado Pago PIX
-**Complexidade:** L  
+### 💰 [P0-DONATION-001] Integração Stripe PIX
+**Complexidade:** L
 **Dependências:** INFRA-002
 
-**Como** desenvolvedor  
-**Quero** integrar pagamentos PIX  
+**Como** desenvolvedor
+**Quero** integrar pagamentos PIX via Stripe
 **Para** permitir micro-doações
 
 **Critérios de Aceitação:**
-- [ ] Conta Mercado Pago criada (modo produção)
-- [ ] SDK Mercado Pago instalado
-- [ ] API de pagamentos configurada
-- [ ] Geração de QR Code PIX funcionando
+- [ ] Conta Stripe criada (modo produção)
+- [ ] Stripe SDK instalado (@stripe/stripe-js)
+- [ ] API de pagamentos Stripe configurada
+- [ ] PIX habilitado na conta Stripe (suporte Brasil)
+- [ ] Geração de QR Code PIX funcionando (Stripe Payment Intents)
 - [ ] Webhook para confirmação de pagamento
 - [ ] Tabela donations com campos:
-  - payment_id (MP reference)
+  - payment_id (Stripe Payment Intent ID)
   - status (pending/completed/failed)
   - amount, ecopoint_id, user_id
 - [ ] Tratamento de erros e timeouts
 - [ ] Logs de transações
-- [ ] Testes em sandbox
+- [ ] Testes em modo de teste (test mode)
 
 **Definição de Pronto:**
-- Pagamento PIX completo funciona
+- Pagamento PIX via Stripe funciona
 - Webhook recebe confirmação
 - Status atualiza corretamente
-- Segurança OK
+- Segurança OK (variáveis de ambiente)
 
 ---
 
 ### 💰 [P0-DONATION-002] Modal de doação
-**Complexidade:** M  
+**Complexidade:** M
 **Dependências:** DONATION-001, AUTH-001
 
-**Como** usuário logado  
-**Quero** apoiar um ecoponto com doação  
+**Como** usuário logado
+**Quero** apoiar um ecoponto com doação
 **Para** contribuir com a iniciativa
 
 **Critérios de Aceitação:**
@@ -884,7 +885,7 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
   - Input custom (min R$ 2)
   - Total + taxas visíveis
   - Botão "Gerar QR Code PIX"
-- [ ] Após clicar: chama API MP
+- [ ] Após clicar: chama API Stripe (create Payment Intent)
 - [ ] Exibe QR Code e código PIX (copiar)
 - [ ] Timer de expiração (5 minutos)
 - [ ] Polling para verificar pagamento (5s interval)
@@ -1162,7 +1163,7 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 - P0-IMPORT-004 - Email automático de convite
 - P0-VALIDATE-001 - Landing page de validação
 - P0-VALIDATE-002 - Formulário de validação
-- P0-DONATION-001 - Integração Mercado Pago PIX
+- P0-DONATION-001 - Integração Stripe PIX
 
 ---
 
@@ -1170,23 +1171,16 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 
 ```mermaid
 %%{init: {
-  'theme': 'base',
+  'theme': 'default',
   'themeVariables': {
-    'primaryColor': '#10b981',
-    'primaryTextColor': '#ffffff',
-    'primaryBorderColor': '#059669',
-    'lineColor': '#6b7280',
-    'secondaryColor': '#3b82f6',
-    'tertiaryColor': '#d1d5db',
-    'taskTextColor': '#1f2937',
-    'taskTextOutsideColor': '#374151',
+    'primaryColor': '#9ca3af',
+    'primaryBorderColor': '#6b7280',
     'doneTaskBkgColor': '#10b981',
-    'doneTaskBorderColor': '#047857',
+    'doneTaskBorderColor': '#059669',
     'activeTaskBkgColor': '#3b82f6',
-    'activeTaskBorderColor': '#1d4ed8',
-    'gridColor': '#e5e7eb',
-    'todayLineColor': '#ef4444',
-    'sectionBkgColor': '#f3f4f6'
+    'activeTaskBorderColor': '#2563eb',
+    'taskBkgColor': '#e5e7eb',
+    'taskBorderColor': '#9ca3af'
   }
 }}%%
 gantt
@@ -1215,35 +1209,35 @@ gantt
     section Filtros
     Filtro por categoria       :done, filter1, 2024-11-16, 1d
     Filtro por raio            :done, filter2, 2024-11-16, 1d
-    Busca por nome             :        filter3, after filter2, 3d
+    Busca por nome             :filter3, 2024-11-20, 3d
 
     section Autenticação
     Login Email/Google         :done, auth1, 2024-11-17, 1d
     Página de cadastro         :done, auth2, 2024-11-17, 1d
-    Perfil do usuário          :        auth3, after auth2, 2d
+    Perfil do usuário          :auth3, 2024-11-20, 2d
 
     section Importação
     Interface Google Maps      :done, import1, 2024-11-17, 1d
     Categorização manual       :done, import2, 2024-11-17, 1d
     Salvar como pending        :done, import3, 2024-11-17, 1d
-    Email de convite           :        import4, after import3, 3d
+    Email de convite           :import4, 2024-11-20, 3d
 
     section Validação
-    Landing page               :        valid1, after import3, 2d
-    Formulário validação       :        valid2, after valid1, 3d
-    Mudança de status          :        valid3, after valid2, 1d
+    Landing page               :valid1, 2024-11-23, 2d
+    Formulário validação       :valid2, 2024-11-25, 3d
+    Mudança de status          :valid3, 2024-11-28, 1d
 
     section Doações
-    Integração Mercado Pago    :        donation1, after valid3, 5d
-    Modal de doação            :        donation2, after donation1, 3d
-    Sistema de reputação       :        donation3, after donation2, 3d
+    Integração Stripe PIX      :donation1, 2024-11-29, 5d
+    Modal de doação            :donation2, 2024-12-04, 3d
+    Sistema de reputação       :donation3, 2024-12-07, 3d
 
     section Reviews
-    Adicionar avaliação        :        review1, after donation3, 3d
-    Listagem de reviews        :        review2, after review1, 2d
+    Adicionar avaliação        :review1, 2024-12-10, 3d
+    Listagem de reviews        :review2, 2024-12-13, 2d
 ```
 
 **Legenda:**
-- 🟢 Verde = Concluído
-- 🔵 Azul = Em andamento
-- ⬜ Cinza = Planejado
+- 🟢 **Verde** = Concluído (done)
+- 🔵 **Azul** = Em andamento (active)
+- ⬜ **Cinza** = Planejado
