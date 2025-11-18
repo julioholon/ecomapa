@@ -1171,7 +1171,7 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 
 ```mermaid
 %%{init: {
-  'theme': 'default',
+  'theme': 'base',
   'themeVariables': {
     'primaryColor': '#9ca3af',
     'primaryBorderColor': '#6b7280',
