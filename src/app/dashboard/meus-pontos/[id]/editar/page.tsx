@@ -29,13 +29,8 @@ export default function EditarEcopontoPage() {
   })
 
   useEffect(() => {
-    if (!user) {
-      router.push(`/login?redirect=/dashboard/meus-pontos/${id}/editar`)
-      return
-    }
-
     fetchEcopoint()
-  }, [user, id, router])
+  }, [user, id])
 
   const fetchEcopoint = async () => {
     if (!user?.id) return

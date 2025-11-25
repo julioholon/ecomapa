@@ -31,13 +31,8 @@ export default function MeusPontosPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!user) {
-      router.push('/login?redirect=/dashboard/meus-pontos')
-      return
-    }
-
     fetchEcopoints()
-  }, [user, router])
+  }, [user])
 
   const fetchEcopoints = async () => {
     if (!user?.id) return

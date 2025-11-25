@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import ProtectedRoute from '@/components/Auth/ProtectedRoute'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/contexts/AuthContext'
 import { useGeolocation } from '@/hooks/useGeolocation'
@@ -265,8 +264,7 @@ export default function ImportarPage() {
   }, [latitude, longitude])
 
   return (
-    <ProtectedRoute>
-      <div className="flex h-screen flex-col">
+    <div className="flex h-screen flex-col">
         {/* Header */}
         <header className="flex items-center justify-between bg-white px-4 py-3 shadow-sm">
           <div className="flex items-center gap-4">
@@ -355,6 +353,5 @@ export default function ImportarPage() {
           )}
         </div>
       </div>
-    </ProtectedRoute>
   )
 }
