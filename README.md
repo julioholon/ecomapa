@@ -150,6 +150,28 @@ Abra [http://localhost:3000](http://localhost:3000) no navegador.
    - `VALIDATION_TOKEN_SECRET` (recomendado para produção)
 4. Deploy automático acontece a cada push para `main`
 
+### 6. Fazer Deploy (Push para Netlify)
+
+Sempre que você fizer alterações e quiser fazer deploy:
+
+```bash
+# 1. Adicionar arquivos modificados
+git add .
+
+# 2. Criar commit
+git commit -m "Descrição das mudanças"
+
+# 3. Fazer push para GitHub (dispara deploy automático no Netlify)
+git push origin main
+```
+
+O Netlify detectará o push e iniciará o build automaticamente. Você pode acompanhar o progresso em:
+- [Netlify Dashboard](https://app.netlify.com) → Seu projeto → Deploys
+
+**Importante**: Antes do primeiro deploy, não esqueça de:
+- Aplicar as migrations no Supabase (via SQL Editor ou `npm run db:push`)
+- Configurar todas as variáveis de ambiente no Netlify
+
 ## Scripts
 
 - `npm run dev` - Servidor de desenvolvimento (Turbopack)
