@@ -178,7 +178,10 @@ export default function ImportarPage() {
 
       console.log('Importing place:', insertData)
 
-      const { error: insertError } = await (supabase.from('ecopoints') as ReturnType<typeof supabase.from>).insert(insertData as Record<string, unknown>)
+      const { data: insertedData, error: insertError } = await (supabase.from('ecopoints') as ReturnType<typeof supabase.from>)
+        .insert(insertData as Record<string, unknown>)
+        .select('id')
+        .single()
 
       if (insertError) {
         console.error('Supabase insert error:', insertError)
@@ -191,6 +194,29 @@ export default function ImportarPage() {
       )
 
       setSuccessMessage(`"${place.name}" importado com sucesso!`)
+
+      // Send validation email in background (don't await, don't block UI)
+      if (insertedData?.id && user.email) {
+        fetch('/api/send-validation-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ecopointId: insertedData.id,
+            ecopointName: place.name,
+            ecopointAddress: place.address,
+            ecopointEmail: user.email,
+          }),
+        })
+          .then((res) => {
+            if (res.ok) {
+              console.log('Email de validação enviado para:', user.email)
+            } else {
+              console.warn('Falha ao enviar email de validação')
+            }
+          })
+          .catch((err) => console.warn('Erro ao enviar email:', err))
+      }
+
       setTimeout(() => setSuccessMessage(null), 3000)
     } catch (err) {
       console.error('Import error:', err)

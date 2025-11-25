@@ -7,9 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:push": "npx supabase db push",
-    "db:pull": "npx supabase db pull",
-    "db:reset": "npx supabase db reset",
+    "db:push": "dotenv -e .env.local -- npx supabase db push",
+    "db:pull": "dotenv -e .env.local -- npx supabase db pull",
+    "db:reset": "dotenv -e .env.local -- npx supabase db reset",
     "db:migration:new": "npx supabase migration new",
     "db:types": "npx supabase gen types typescript --local > src/lib/supabase/database.types.ts"
   },
@@ -22,7 +22,8 @@
     "next": "16.0.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "react-leaflet": "^5.0.0"
+    "react-leaflet": "^5.0.0",
+    "resend": "^6.5.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -31,6 +32,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "eslint-config-prettier": "^10.1.8",

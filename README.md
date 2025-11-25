@@ -77,6 +77,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anon_aqui
 # Google Places API (opcional - para importação)
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=sua_chave_google_aqui
 
+# Resend (obrigatório - para emails de validação)
+RESEND_API_KEY=re_sua_chave_aqui
+EMAIL_FROM=EcoMapa <seu-email@dominio.com>
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Tokens de validação (opcional - gerado automaticamente se não configurado)
+VALIDATION_TOKEN_SECRET=sua_string_secreta_aqui
+VALIDATION_TOKEN_EXPIRATION_DAYS=90
+
 # Stripe PIX (futuro)
 STRIPE_SECRET_KEY=sk_test_...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
@@ -103,6 +112,22 @@ Para usar a funcionalidade de importação do Google Maps:
 
 **Nota**: O Google oferece $200/mês de créditos gratuitos, suficiente para ~40.000 requisições de Places API.
 
+#### Obter API Key do Resend (obrigatório)
+
+Para enviar emails de validação aos ecopontos importados:
+
+1. Acesse [Resend](https://resend.com) e crie uma conta
+2. No dashboard, vá em **API Keys**
+3. Clique em **Create API Key**
+4. Dê um nome (ex: "EcoMapa Production") e copie a chave
+5. Adicione ao `.env.local` como `RESEND_API_KEY`
+6. Configure o domínio de envio:
+   - **Desenvolvimento**: Use o domínio padrão `onboarding@resend.dev` (limite de 100 emails/dia)
+   - **Produção**: Adicione e verifique seu próprio domínio em **Domains**
+7. Atualize `EMAIL_FROM` no `.env.local` com seu email verificado
+
+**Nota**: Resend oferece 3.000 emails/mês no plano gratuito. Perfeito para começar!
+
 ### 4. Rodar em Desenvolvimento
 
 ```bash
@@ -118,7 +143,11 @@ Abra [http://localhost:3000](http://localhost:3000) no navegador.
 3. Adicione as variáveis de ambiente no Netlify Dashboard:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
+   - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` (opcional)
+   - `RESEND_API_KEY` (obrigatório)
+   - `EMAIL_FROM` (obrigatório)
+   - `NEXT_PUBLIC_SITE_URL` (use sua URL do Netlify, ex: https://ecomapa.netlify.app)
+   - `VALIDATION_TOKEN_SECRET` (recomendado para produção)
 4. Deploy automático acontece a cada push para `main`
 
 ## Scripts
