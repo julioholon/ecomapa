@@ -28,11 +28,14 @@ export default function ValidarPontoPage() {
 
         // Fetch ecopoint data
         const supabase = createClient()
-        const { data, error: fetchError } = await supabase
+        const response = await supabase
           .from('ecopoints')
           .select('*')
           .eq('id', tokenData.ecopointId)
           .single()
+
+        const data = response.data as any
+        const fetchError = response.error
 
         if (fetchError || !data) {
           setError('Ecoponto não encontrado')
