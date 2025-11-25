@@ -14,6 +14,7 @@
     "db:types": "npx supabase gen types typescript --local > src/lib/supabase/database.types.ts"
   },
   "dependencies": {
+    "@react-email/components": "^0.5.7",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.81.1",
     "@types/leaflet.markercluster": "^1.5.6",
