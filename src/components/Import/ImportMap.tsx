@@ -10,6 +10,7 @@ interface ImportMapProps {
   center: [number, number]
   places: PlaceResult[]
   onCategoryChange: (id: string, category: string[]) => void
+  onEmailChange: (id: string, ownerEmail: string) => void
   onImport: (place: PlaceResult) => void
   importingId: string | null
 }
@@ -18,19 +19,20 @@ export default memo(function ImportMap({
   center,
   places,
   onCategoryChange,
+  onEmailChange,
   onImport,
   importingId,
 }: ImportMapProps) {
   const mapRef = useRef<L.Map | null>(null)
   const markersRef = useRef<L.Marker[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
-  const callbacksRef = useRef({ onCategoryChange, onImport })
+  const callbacksRef = useRef({ onCategoryChange, onEmailChange, onImport })
   const placesRef = useRef<PlaceResult[]>([])
 
   // Keep callbacks ref updated
   useEffect(() => {
-    callbacksRef.current = { onCategoryChange, onImport }
-  }, [onCategoryChange, onImport])
+    callbacksRef.current = { onCategoryChange, onEmailChange, onImport }
+  }, [onCategoryChange, onEmailChange, onImport])
 
   // Keep places ref updated for popup access
   useEffect(() => {
@@ -226,6 +228,38 @@ export default memo(function ImportMap({
       dropdownWrapper.appendChild(dropdownMenu)
       categoryDiv.appendChild(dropdownWrapper)
       container.appendChild(categoryDiv)
+
+      // Email input
+      const emailDiv = document.createElement('div')
+      emailDiv.style.marginBottom = '12px'
+
+      const emailLabel = document.createElement('label')
+      emailLabel.style.cssText = 'display: block; font-size: 12px; font-weight: 500; color: #374151; margin-bottom: 4px;'
+      emailLabel.textContent = 'Email do responsável *'
+      emailDiv.appendChild(emailLabel)
+
+      const emailInput = document.createElement('input')
+      emailInput.type = 'email'
+      emailInput.value = place.ownerEmail || ''
+      emailInput.placeholder = 'contato@exemplo.com'
+      emailInput.style.cssText = `
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+      `
+
+      emailInput.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement
+        place.ownerEmail = target.value
+        // Update the ref
+        const placeInRef = placesRef.current.find(p => p.id === place.id)
+        if (placeInRef) placeInRef.ownerEmail = target.value
+      })
+
+      emailDiv.appendChild(emailInput)
+      container.appendChild(emailDiv)
 
       // Import button
       const button = document.createElement('button')

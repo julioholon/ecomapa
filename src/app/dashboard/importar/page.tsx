@@ -36,6 +36,7 @@ export interface PlaceResult {
   lng: number
   rating?: number
   category: string[]
+  ownerEmail: string
   imported: boolean
 }
 
@@ -94,6 +95,7 @@ export default function ImportarPage() {
         lng: place.lng,
         rating: place.rating,
         category: [],
+        ownerEmail: '',
         imported: false,
       }))
 
@@ -138,6 +140,7 @@ export default function ImportarPage() {
         lng: longitude + offsetLng,
         rating: 3.5 + Math.random() * 1.5,
         category: [],
+        ownerEmail: '',
         imported: false,
       })
     }
@@ -151,9 +154,27 @@ export default function ImportarPage() {
     )
   }, [])
 
+  const handleEmailChange = useCallback((id: string, ownerEmail: string) => {
+    setResults((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, ownerEmail } : r))
+    )
+  }, [])
+
   const handleImportPlace = useCallback(async (place: PlaceResult) => {
     if (!place.category || place.category.length === 0) {
       setError('Selecione pelo menos uma categoria antes de importar')
+      return
+    }
+
+    if (!place.ownerEmail || !place.ownerEmail.trim()) {
+      setError('Digite o email do responsável pelo ecoponto antes de importar')
+      return
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(place.ownerEmail)) {
+      setError('Digite um email válido')
       return
     }
 
@@ -171,7 +192,7 @@ export default function ImportarPage() {
       const insertData = {
         name: place.name,
         description: `Importado do Google Maps. Endereço: ${place.address}`,
-        email: user.email || 'import@ecomapa.com',
+        email: place.ownerEmail,
         location: `POINT(${place.lng} ${place.lat})`,
         category: place.category,
         status: 'pending',
@@ -199,7 +220,7 @@ export default function ImportarPage() {
       setSuccessMessage(`"${place.name}" importado com sucesso!`)
 
       // Send validation email in background (don't await, don't block UI)
-      if (insertedData?.id && user.email) {
+      if (insertedData?.id && place.ownerEmail) {
         fetch('/api/send-validation-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -207,12 +228,12 @@ export default function ImportarPage() {
             ecopointId: insertedData.id,
             ecopointName: place.name,
             ecopointAddress: place.address,
-            ecopointEmail: user.email,
+            ecopointEmail: place.ownerEmail,
           }),
         })
           .then((res) => {
             if (res.ok) {
-              console.log('Email de validação enviado para:', user.email)
+              console.log('Email de validação enviado para:', place.ownerEmail)
             } else {
               console.warn('Falha ao enviar email de validação')
             }
@@ -313,6 +334,7 @@ export default function ImportarPage() {
               center={mapCenter}
               places={results}
               onCategoryChange={handleCategoryChange}
+              onEmailChange={handleEmailChange}
               onImport={handleImportPlace}
               importingId={importingId}
             />
