@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has permission (is the importer or admin)
-    if (ecopoint.imported_by !== user.id) {
+    if ((ecopoint as { imported_by: string | null }).imported_by !== user.id) {
       return NextResponse.json(
         { error: 'Você não tem permissão para enviar email para este ecoponto' },
         { status: 403 }
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already validated
-    if (ecopoint.status === 'validated') {
+    if ((ecopoint as { status: string }).status === 'validated') {
       return NextResponse.json(
         { error: 'Ecoponto já validado' },
         { status: 400 }
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
         ecopointName,
         ecopointAddress: ecopointAddress || 'Endereço não disponível',
         validationUrl,
-      }),
+      }) as React.ReactElement,
     })
 
     if (emailError) {
@@ -100,12 +100,11 @@ export async function POST(request: NextRequest) {
     })
 
     // Update ecopoint with email_sent flag
-    await supabase
-      .from('ecopoints')
+    await (supabase.from('ecopoints') as ReturnType<typeof supabase.from>)
       .update({
         validation_email_sent: true,
         validation_email_sent_at: new Date().toISOString(),
-      })
+      } as Record<string, unknown>)
       .eq('id', ecopointId)
 
     return NextResponse.json({
