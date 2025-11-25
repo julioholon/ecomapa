@@ -377,7 +377,7 @@ export default function ValidarPontoPage() {
                       className="mt-1 rounded border-gray-300 text-green-600 focus:ring-green-500"
                     />
                     <label htmlFor="acceptDonations" className="text-sm text-gray-700">
-                      <strong>Aceito receber micro-doações via PIX</strong>
+                      <strong>Aceito receber micro-doações</strong>
                       <p className="text-gray-600 mt-1">
                         Visitantes do mapa poderão apoiar seu ecoponto com doações espontâneas
                       </p>
