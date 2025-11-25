@@ -12,6 +12,9 @@ import { searchNearbyPlaces } from '@/lib/google-places'
 // Check API key availability at build time
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
+// Debug: Log API key status (remove after testing)
+console.log('Google Maps API Key configured:', !!GOOGLE_MAPS_API_KEY)
+
 // Dynamic import for map component (SSR-safe)
 const ImportMap = dynamic(() => import('@/components/Import/ImportMap'), {
   ssr: false,
