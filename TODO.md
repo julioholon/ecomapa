@@ -535,32 +535,32 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 ---
 
 ### 📥 [P0-IMPORT-004] Email automático de convite
-**Complexidade:** M  
+**Complexidade:** M
 **Dependências:** IMPORT-003
+**Status:** ✅ Completo
 
-**Como** sistema  
-**Quero** enviar email ao contato do ecoponto  
+**Como** sistema
+**Quero** enviar email ao contato do ecoponto
 **Para** convidá-lo a validar seu cadastro
 
 **Critérios de Aceitação:**
-- [ ] Resend ou SendGrid configurado
-- [ ] Template de email criado:
+- [x] Resend configurado
+- [x] Template de email criado com React Email:
   - Assunto: "Seu negócio foi adicionado ao EcoMapa!"
   - Corpo: explicação do EcoMapa
-  - Link único de validação (token)
+  - Link único de validação (token HMAC, 90 dias)
   - CTA: "Validar Meu Ponto"
-  - Opção "Não é meu negócio" (report)
-- [ ] Email enviado em background (queue)
-- [ ] Token JWT com 30 dias de validade
-- [ ] Retry em caso de falha (3x)
-- [ ] Log de emails enviados
-- [ ] Respects rate limit (100/hora)
+  - Informações sobre benefícios de validar
+- [x] Email enviado automaticamente após import
+- [x] Token seguro (HMAC) com 90 dias de validade
+- [x] Log de emails enviados (console + database)
+- [ ] Retry em caso de falha (3x) - não implementado
+- [ ] Rate limit (100/hora) - não implementado
 
 **Definição de Pronto:**
-- Email chega na caixa de entrada (não spam)
-- Link funciona
-- Template mobile-friendly
-- Tracking de abertura (opcional)
+- [x] Email chega na caixa de entrada
+- [x] Link funciona
+- [x] Template mobile-friendly
 
 ---
 
@@ -658,28 +658,36 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 ## ÉPICO 7: Validação de Pontos
 
 ### ✅ [P0-VALIDATE-001] Landing page de validação
-**Complexidade:** M  
+**Complexidade:** M
 **Dependências:** AUTH-001, IMPORT-004
+**Status:** ✅ Completo
 
-**Como** administrador de ponto  
-**Quero** validar meu ecoponto via link do email  
+**Como** administrador de ponto
+**Quero** validar meu ecoponto via link do email
 **Para** começar a receber doações
 
 **Critérios de Aceitação:**
-- [ ] Página /validar-ponto/[token]
-- [ ] Valida token JWT
-- [ ] Se token inválido/expirado: mensagem erro
-- [ ] Se válido: mostra preview do ecoponto
-- [ ] Botão "Este é meu negócio" → prossegue
-- [ ] Botão "Não é meu negócio" → reporta erro
-- [ ] Se não logado: redirect para login (preserva token)
-- [ ] Após login: retorna para validação
-- [ ] Marca token como usado
+- [x] Página /validar-ponto/[token]
+- [x] Valida token HMAC (não JWT, mais simples)
+- [x] Se token inválido/expirado: mensagem erro
+- [x] Se válido: mostra preview do ecoponto
+- [x] Verifica se já foi validado (mostra mensagem)
+- [x] Botões "Fazer Login" / "Criar Conta" (preserva token via redirect param)
+- [x] Botão "Reportar erro" (placeholder, não funcional)
+- [x] Loading state durante verificação
+- [x] Design responsivo e UX clara
+- [ ] Após login: retorna para validação (P0-VALIDATE-002)
+- [ ] Marca token como usado (P0-VALIDATE-003)
 
 **Definição de Pronto:**
-- Token validation segura
-- Fluxo completo sem erros
-- UX clara
+- [x] Token validation segura
+- [x] Mensagens de erro apropriadas
+- [x] UX clara e profissional
+
+**Notas:**
+- Implementado com HMAC tokens (90 dias validade)
+- Redirect para login/cadastro preserva token na URL
+- Fluxo completo de validação será em P0-VALIDATE-002
 
 ---
 
@@ -1158,11 +1166,12 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 - ✅ P0-IMPORT-001 - Interface Google Places (API real com busca e visualização)
 - ✅ P0-IMPORT-002 - Categorização manual (multi-categoria com checkboxes)
 - ✅ P0-IMPORT-003 - Salvar pontos como pending (importação para Supabase)
+- ✅ P0-IMPORT-004 - Email automático de convite (Resend + React Email + HMAC tokens)
+- ✅ P0-VALIDATE-001 - Landing page de validação (verificação de token, preview do ponto)
 
 **Próximos:**
-- P0-IMPORT-004 - Email automático de convite
-- P0-VALIDATE-001 - Landing page de validação
 - P0-VALIDATE-002 - Formulário de validação
+- P0-VALIDATE-003 - Mudança de status para "validated"
 - P0-DONATION-001 - Integração Stripe PIX
 
 ---
@@ -1220,12 +1229,12 @@ gantt
     Interface Google Maps      :done, import1, 2024-11-17, 1d
     Categorização manual       :done, import2, 2024-11-17, 1d
     Salvar como pending        :done, import3, 2024-11-17, 1d
-    Email de convite           :import4, 2024-11-20, 3d
+    Email de convite           :done, import4, 2024-11-25, 1d
 
     section Validação
-    Landing page               :valid1, 2024-11-23, 2d
-    Formulário validação       :valid2, 2024-11-25, 3d
-    Mudança de status          :valid3, 2024-11-28, 1d
+    Landing page               :done, valid1, 2024-11-25, 1d
+    Formulário validação       :valid2, 2024-11-26, 3d
+    Mudança de status          :valid3, 2024-11-29, 1d
 
     section Doações
     Integração Stripe PIX      :donation1, 2024-11-29, 5d

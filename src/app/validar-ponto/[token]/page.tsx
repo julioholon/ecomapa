@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { verifyValidationToken } from '@/lib/tokens'
-import { createClient } from '@/lib/supabase/client'
 
 export default function ValidarPontoPage() {
   const params = useParams()
@@ -17,40 +15,22 @@ export default function ValidarPontoPage() {
   useEffect(() => {
     async function validateToken() {
       try {
-        // Verify token
-        const tokenData = verifyValidationToken(token)
+        // Verify token via API route
+        const response = await fetch('/api/verify-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        })
 
-        if (!tokenData) {
-          setError('Link de validação inválido ou expirado')
+        const data = await response.json()
+
+        if (!response.ok || data.error) {
+          setError(data.error || 'Erro ao validar token')
           setLoading(false)
           return
         }
 
-        // Fetch ecopoint data
-        const supabase = createClient()
-        const response = await supabase
-          .from('ecopoints')
-          .select('*')
-          .eq('id', tokenData.ecopointId)
-          .single()
-
-        const data = response.data as any
-        const fetchError = response.error
-
-        if (fetchError || !data) {
-          setError('Ecoponto não encontrado')
-          setLoading(false)
-          return
-        }
-
-        // Check if already validated
-        if (data.status === 'validated') {
-          setError('Este ecoponto já foi validado')
-          setLoading(false)
-          return
-        }
-
-        setEcopoint(data)
+        setEcopoint(data.ecopoint)
         setLoading(false)
       } catch (err) {
         console.error('Validation error:', err)
