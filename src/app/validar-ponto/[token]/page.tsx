@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function ValidarPontoPage() {
   const params = useParams()
   const router = useRouter()
   const token = params.token as string
+  const { user } = useAuth()
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -41,6 +43,15 @@ export default function ValidarPontoPage() {
 
     validateToken()
   }, [token])
+
+  // If user is logged in and ecopoint is loaded, proceed to validation form
+  useEffect(() => {
+    if (user && ecopoint && !loading && !error) {
+      // TODO: Redirect to validation form (P0-VALIDATE-002)
+      // For now, just show success message
+      console.log('User authenticated, ready to validate:', { user, ecopoint })
+    }
+  }, [user, ecopoint, loading, error])
 
   if (loading) {
     return (
@@ -116,23 +127,47 @@ export default function ValidarPontoPage() {
 
           {/* CTA */}
           <div className="border-t pt-6">
-            <p className="text-sm text-gray-600 mb-4">
-              Para continuar, você precisa estar logado ou criar uma conta.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => router.push(`/login?redirect=/validar-ponto/${token}`)}
-                className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700"
-              >
-                Fazer Login
-              </button>
-              <button
-                onClick={() => router.push(`/cadastro?redirect=/validar-ponto/${token}`)}
-                className="flex-1 bg-white text-green-600 px-6 py-3 rounded-lg font-medium border-2 border-green-600 hover:bg-green-50"
-              >
-                Criar Conta
-              </button>
-            </div>
+            {user ? (
+              <>
+                <div className="mb-4 rounded-lg bg-green-50 border border-green-200 p-4">
+                  <p className="text-sm text-green-800">
+                    ✅ Você está logado como <strong>{user.email}</strong>
+                  </p>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Pronto! Agora você pode prosseguir com a validação do seu ecoponto.
+                </p>
+                <button
+                  onClick={() => {
+                    // TODO: Navigate to validation form (P0-VALIDATE-002)
+                    alert('Formulário de validação será implementado em P0-VALIDATE-002')
+                  }}
+                  className="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700"
+                >
+                  Continuar Validação
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-gray-600 mb-4">
+                  Para continuar, você precisa estar logado ou criar uma conta.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => router.push(`/login?redirect=/validar-ponto/${token}`)}
+                    className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700"
+                  >
+                    Fazer Login
+                  </button>
+                  <button
+                    onClick={() => router.push(`/cadastro?redirect=/validar-ponto/${token}`)}
+                    className="flex-1 bg-white text-green-600 px-6 py-3 rounded-lg font-medium border-2 border-green-600 hover:bg-green-50"
+                  >
+                    Criar Conta
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Not your business? */}

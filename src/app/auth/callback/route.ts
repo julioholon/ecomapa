@@ -11,6 +11,7 @@ export async function GET(request: Request) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(`${origin}/`)
+  // Redirect to client-side callback handler that will check localStorage
+  // and redirect to the appropriate page
+  return NextResponse.redirect(`${origin}/auth/callback-handler`)
 }
