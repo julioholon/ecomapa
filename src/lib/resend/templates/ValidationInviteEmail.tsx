@@ -79,7 +79,7 @@ export const ValidationInviteEmail: React.FC<ValidationInviteEmailProps> = ({
             <Text style={noteText}>
               <strong>Benefícios ao validar:</strong>
               <br />• Apareça com badge "Validado" no mapa
-              <br />• Receba micro-doações via PIX da comunidade
+              <br />• Receba micro-doações da comunidade via PIX e Cartão de crédito
               <br />• Adicione fotos, horários e informações de contato
               <br />• Gerencie suas informações sempre que quiser
             </Text>

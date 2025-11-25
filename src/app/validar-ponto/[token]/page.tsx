@@ -225,7 +225,7 @@ export default function ValidarPontoPage() {
             <h3 className="font-bold text-gray-900 mb-2">O que acontece ao validar?</h3>
             <ul className="space-y-2 text-gray-600">
               <li>✅ Seu ponto aparecerá no mapa com badge "Validado"</li>
-              <li>💰 Você poderá receber micro-doações via PIX</li>
+              <li>💰 Você poderá receber micro-doações via PIX e Cartão de crédito</li>
               <li>📸 Poderá adicionar fotos e informações completas</li>
               <li>⚙️ Terá acesso ao painel de gerenciamento</li>
             </ul>
