@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { EcopointLocation } from '@/hooks/useEcopoints'
 import { getPrimaryCategory, CATEGORY_MAP } from '@/lib/constants/categories'
+import DonationModal from '@/components/Donation/DonationModal'
 
 interface DetailModalProps {
   ecopoint: EcopointLocation | null
@@ -10,6 +11,8 @@ interface DetailModalProps {
 }
 
 export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
+  const [showDonationModal, setShowDonationModal] = useState(false)
+
   // Close on ESC key
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -291,11 +294,10 @@ export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
               Compartilhar
             </button>
 
-            {ecopoint.status === 'validated' && (
+            {ecopoint.status === 'validated' && ecopoint.accepts_donations && (
               <button
-                disabled
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-yellow-500 px-4 py-3 font-medium text-white opacity-50 cursor-not-allowed"
-                title="Em breve"
+                onClick={() => setShowDonationModal(true)}
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 font-medium text-white hover:bg-green-700"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -305,12 +307,23 @@ export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
                     d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                   />
                 </svg>
-                Apoiar
+                💰 Apoiar
               </button>
             )}
           </div>
         </div>
       </div>
+
+      {/* Donation Modal */}
+      <DonationModal
+        ecopoint={{
+          id: ecopoint.id,
+          name: ecopoint.name,
+          description: ecopoint.description,
+        }}
+        isOpen={showDonationModal}
+        onClose={() => setShowDonationModal(false)}
+      />
     </div>
   )
 }

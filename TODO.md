@@ -911,7 +911,7 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 - [ ] Modal com:
   - Foto e nome do ecoponto
   - Valores sugeridos: R$ 5, 10, 20
-  - Input custom (min R$ 2)
+  - Input custom (min R$ 1)
   - Total + taxas visíveis
   - Botão "Gerar QR Code PIX"
 - [ ] Após clicar: chama API Stripe (create Payment Intent)

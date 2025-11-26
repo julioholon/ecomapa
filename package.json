@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@react-email/components": "^0.5.7",
+    "@stripe/stripe-js": "^8.5.3",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.81.1",
     "@types/leaflet.markercluster": "^1.5.6",
@@ -24,7 +25,8 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-leaflet": "^5.0.0",
-    "resend": "^6.5.2"
+    "resend": "^6.5.2",
+    "stripe": "^20.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -12,7 +12,7 @@ EcoMapa torna visível a rede de ecopontos (feiras ecológicas, hortas comunitá
 - **Mapa**: Leaflet + React-Leaflet + Markercluster
 - **Backend**: Supabase (PostgreSQL + PostGIS)
 - **Auth**: Supabase Auth (Email/Senha + Google OAuth)
-- **Pagamentos**: PIX (em desenvolvimento)
+- **Pagamentos**: Stripe (PIX + Cartão de Crédito)
 - **Hosting**: Netlify
 
 ## Setup
@@ -86,9 +86,10 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 VALIDATION_TOKEN_SECRET=sua_string_secreta_aqui
 VALIDATION_TOKEN_EXPIRATION_DAYS=90
 
-# Stripe PIX (futuro)
+# Stripe (obrigatório - para doações via PIX e cartão)
 STRIPE_SECRET_KEY=sk_test_...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 
@@ -128,6 +129,56 @@ Para enviar emails de validação aos ecopontos importados:
 
 **Nota**: Resend oferece 3.000 emails/mês no plano gratuito. Perfeito para começar!
 
+#### Obter Chaves do Stripe (obrigatório)
+
+Para aceitar doações via PIX e cartão de crédito:
+
+1. **Criar conta no Stripe**:
+   - Acesse [Stripe](https://stripe.com/br) e crie uma conta
+   - Complete o processo de cadastro (pode começar sem verificar, usando modo teste)
+
+2. **Obter as chaves de API**:
+   - No dashboard do Stripe, vá em **Developers > API keys**
+   - Você verá duas chaves no modo **Test**:
+     - **Publishable key** (começa com `pk_test_...`) → Copie para `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+     - **Secret key** (começa com `sk_test_...`) → Copie para `STRIPE_SECRET_KEY`
+   - ⚠️ **Nunca** exponha a Secret key no código frontend!
+
+3. **Habilitar PIX**:
+   - Vá em **Settings > Payment methods**
+   - Procure por **PIX** e ative
+   - PIX funciona automaticamente no modo teste do Stripe
+
+4. **Configurar Webhook** (importante para confirmar pagamentos):
+   - Vá em **Developers > Webhooks**
+   - Clique em **Add endpoint**
+   - **Endpoint URL**:
+     - Desenvolvimento: `http://localhost:3000/api/webhooks/stripe`
+     - Produção: `https://seu-site.netlify.app/api/webhooks/stripe`
+   - **Events to send**: Selecione os seguintes eventos:
+     - `payment_intent.succeeded`
+     - `payment_intent.payment_failed`
+     - `payment_intent.canceled`
+   - Clique em **Add endpoint**
+   - Copie o **Signing secret** (começa com `whsec_...`) → Adicione ao `.env.local` como `STRIPE_WEBHOOK_SECRET`
+
+5. **Testar pagamentos PIX no modo teste**:
+   - Use as [credenciais de teste do Stripe](https://stripe.com/docs/testing)
+   - Para PIX, o Stripe exibe um QR code de teste que você pode "pagar" instantaneamente
+   - Para cartões, use números de teste: `4242 4242 4242 4242` (Visa válido)
+
+6. **Produção** (quando estiver pronto):
+   - Complete a verificação da conta no Stripe
+   - Troque as chaves de teste (`pk_test_`, `sk_test_`) pelas chaves de produção (`pk_live_`, `sk_live_`)
+   - Atualize o webhook endpoint para a URL de produção
+   - Configure as taxas e recebimentos em **Settings > Business settings**
+
+**Notas importantes**:
+- O Stripe cobra 3,99% + R$ 0,39 por transação com PIX no Brasil
+- Para cartões de crédito: 4,99% + R$ 0,39 por transação
+- Modo teste é gratuito e ilimitado
+- Webhooks são **essenciais** para o fluxo de doações funcionar corretamente
+
 ### 4. Rodar em Desenvolvimento
 
 ```bash
@@ -148,6 +199,9 @@ Abra [http://localhost:3000](http://localhost:3000) no navegador.
    - `EMAIL_FROM` (obrigatório)
    - `NEXT_PUBLIC_SITE_URL` (use sua URL do Netlify, ex: https://ecomapa.netlify.app)
    - `VALIDATION_TOKEN_SECRET` (recomendado para produção)
+   - `STRIPE_SECRET_KEY` (obrigatório - use chave de produção)
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (obrigatório - use chave de produção)
+   - `STRIPE_WEBHOOK_SECRET` (obrigatório - do endpoint de produção)
 4. Deploy automático acontece a cada push para `main`
 
 ### 6. Fazer Deploy (Push para Netlify)
@@ -187,25 +241,35 @@ O Netlify detectará o push e iniciará o build automaticamente. Você pode acom
 ```
 src/
 ├── app/              # App Router (páginas e rotas)
+│   ├── api/          # API Routes
+│   │   ├── create-payment-intent/    # Criar Payment Intent (PIX/Cartão)
+│   │   ├── payment-status/           # Polling de status de pagamento
+│   │   ├── webhooks/stripe/          # Webhook Stripe (confirmação)
+│   │   ├── send-validation-email/    # Enviar email de validação
+│   │   └── verify-token/             # Verificar token HMAC
 │   ├── login/        # Autenticação
 │   ├── cadastro/     # Registro de usuários
-│   ├── dashboard/    # Área logada
-│   └── auth/         # Callback OAuth
+│   ├── dashboard/    # Área logada (importar, meus pontos)
+│   ├── auth/         # Callback OAuth
+│   └── validar-ponto/[token]/  # Validação de ecopontos
 ├── components/
 │   ├── Map/          # Mapa Leaflet e controles
 │   ├── Filters/      # Filtros de categoria e raio
 │   ├── Ecopoint/     # Modal de detalhes
+│   ├── Donation/     # Modal de doação (PIX/Cartão)
 │   ├── Auth/         # Rotas protegidas
 │   └── Layout/       # Header, Footer
 ├── contexts/         # React Context (Auth)
 ├── hooks/            # Custom hooks (geolocation, ecopoints)
 └── lib/
-    ├── supabase/     # Cliente e tipos
+    ├── supabase/     # Cliente e tipos Supabase
+    ├── stripe/       # Configuração Stripe
     └── constants/    # Categorias e config
 ```
 
 ## Funcionalidades
 
+### Mapa e Navegação
 - Mapa interativo com Leaflet
 - Geolocalização do usuário
 - Filtros por categoria e raio de distância
@@ -213,8 +277,24 @@ src/
 - Alternância entre camadas (Ruas/Satélite)
 - Círculos de raio dinâmicos
 - Modal detalhado de ecopontos
-- Autenticação (Email/Google)
-- Importação de lugares do Google Maps (mock)
+
+### Autenticação e Usuários
+- Autenticação com Email/Senha e Google OAuth
+- Sistema de reputação e badges
+- Pontos por doações (+10 pts) e avaliações (+5 pts)
+- Badges: Apoiador Bronze/Prata/Ouro, Explorador
+
+### Doações
+- Pagamentos via PIX (QR Code dinâmico)
+- Pagamentos via Cartão de Crédito (em breve)
+- Valores sugeridos: R$ 5, 10, 20 ou custom (R$ 2-1000)
+- Confirmação automática via webhooks
+- Sistema de reputação integrado
+
+### Administração
+- Importação de lugares do Google Maps
+- Sistema de validação de ecopontos via email
+- Dashboard para gerenciar ecopontos
 - Deploy contínuo no Netlify
 
 ## Contribuição
