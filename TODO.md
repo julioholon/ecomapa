@@ -596,32 +596,33 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 ---
 
 ### 🔐 [P0-AUTH-002] Página de cadastro
-**Complexidade:** S  
+**Complexidade:** S
 **Dependências:** AUTH-001
+**Status:** ✅ Completo
 
-**Como** novo usuário  
-**Quero** criar uma conta  
+**Como** novo usuário
+**Quero** criar uma conta
 **Para** começar a usar o EcoMapa
 
 **Critérios de Aceitação:**
-- [ ] Página /cadastro
-- [ ] Campos:
+- [x] Página /cadastro
+- [x] Campos:
   - Nome completo
   - Email
   - Senha (min 8 caracteres)
   - Confirmar senha
   - Aceite termos de uso (checkbox obrigatório)
-- [ ] Validação client-side (Zod ou similar)
-- [ ] Feedback de erros inline
-- [ ] Email de confirmação enviado
-- [ ] Redirect para /verificar-email
-- [ ] Link para /login se já tem conta
+- [x] Validação client-side (validações manuais)
+- [x] Feedback de erros inline
+- [x] Email de confirmação enviado (Supabase automático)
+- [x] Redirect para tela de verificação
+- [x] Link para /login se já tem conta
 
 **Definição de Pronto:**
-- Cadastro cria usuário no Supabase
-- Email verificação enviado
-- Validações funcionam
-- UX clara
+- [x] Cadastro cria usuário no Supabase
+- [x] Email verificação enviado
+- [x] Validações funcionam
+- [x] UX clara
 
 ---
 
