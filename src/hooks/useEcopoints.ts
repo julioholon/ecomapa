@@ -12,7 +12,7 @@ export interface EcopointLocation {
   status: string
   lat: number
   lng: number
-  address?: string | null
+  address?: string | { street?: string; city?: string; state?: string } | null
   phone?: string | null
   website?: string | null
   instagram?: string | null
@@ -76,7 +76,7 @@ export function useEcopoints(): UseEcopointsReturn {
         console.warn('RPC function not found, using fallback. Location data may not parse correctly.')
 
         // If fallback, we need to handle the raw data
-        const parsedFromFallback: EcopointLocation[] = ((fallbackData || []) as EcopointRow[]).map((point) => {
+        const parsedFromFallback: EcopointLocation[] = ((fallbackData || []) as any[]).map((point) => {
           let lat = 0
           let lng = 0
 
@@ -98,6 +98,12 @@ export function useEcopoints(): UseEcopointsReturn {
             status: point.status,
             lat,
             lng,
+            accepts_donations: point.accepts_donations,
+            phone: point.phone,
+            website: point.website,
+            instagram: point.instagram,
+            facebook: point.facebook,
+            address: point.address,
           }
         })
 
@@ -106,7 +112,7 @@ export function useEcopoints(): UseEcopointsReturn {
       }
 
       // Parse PostGIS geography to lat/lng from RPC response
-      const parsedPoints: EcopointLocation[] = ((data || []) as EcopointRPCRow[]).map((point) => {
+      const parsedPoints: EcopointLocation[] = ((data || []) as any[]).map((point) => {
         // RPC returns location_text as "POINT(lng lat)"
         let lat = 0
         let lng = 0
@@ -129,6 +135,12 @@ export function useEcopoints(): UseEcopointsReturn {
           status: point.status,
           lat,
           lng,
+          accepts_donations: point.accepts_donations,
+          phone: point.phone,
+          website: point.website,
+          instagram: point.instagram,
+          facebook: point.facebook,
+          address: point.address,
         }
       })
 

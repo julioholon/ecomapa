@@ -867,101 +867,123 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 
 ## ÉPICO 9: Micro-doações
 
-### 💰 [P0-DONATION-001] Integração Stripe PIX
+### 💰 [P0-DONATION-001] Integração MercadoPago PIX
 **Complexidade:** L
 **Dependências:** INFRA-002
+**Status:** ✅ Completo
 
 **Como** desenvolvedor
-**Quero** integrar pagamentos PIX via Stripe
+**Quero** integrar pagamentos PIX via MercadoPago
 **Para** permitir micro-doações
 
 **Critérios de Aceitação:**
-- [ ] Conta Stripe criada (modo produção)
-- [ ] Stripe SDK instalado (@stripe/stripe-js)
-- [ ] API de pagamentos Stripe configurada
-- [ ] PIX habilitado na conta Stripe (suporte Brasil)
-- [ ] Geração de QR Code PIX funcionando (Stripe Payment Intents)
-- [ ] Webhook para confirmação de pagamento
-- [ ] Tabela donations com campos:
-  - payment_id (Stripe Payment Intent ID)
+- [x] Conta MercadoPago criada (modo teste)
+- [x] MercadoPago SDK instalado (mercadopago)
+- [x] API de pagamentos MercadoPago configurada
+- [x] PIX habilitado (funciona automaticamente)
+- [x] Geração de QR Code PIX funcionando (base64)
+- [x] Webhook para confirmação de pagamento
+- [x] Tabela donations com campos:
+  - payment_id (MercadoPago Payment ID)
   - status (pending/completed/failed)
   - amount, ecopoint_id, user_id
-- [ ] Tratamento de erros e timeouts
-- [ ] Logs de transações
-- [ ] Testes em modo de teste (test mode)
+- [x] Tratamento de erros e timeouts
+- [x] Logs de transações
+- [x] Testes em modo de teste (credenciais TEST)
 
 **Definição de Pronto:**
-- Pagamento PIX via Stripe funciona
-- Webhook recebe confirmação
-- Status atualiza corretamente
-- Segurança OK (variáveis de ambiente)
+- [x] Pagamento PIX via MercadoPago funciona
+- [x] Webhook recebe confirmação
+- [x] Status atualiza corretamente
+- [x] Segurança OK (variáveis de ambiente)
+
+**Notas:**
+- Migrado do Stripe para MercadoPago (PIX disponível sem lista de espera)
+- Taxa: 2,49% + R$ 0,39 por PIX (mais barato que Stripe)
+- QR Code retornado em base64 diretamente na criação do pagamento
+- Webhook processa eventos: approved, rejected, cancelled
 
 ---
 
 ### 💰 [P0-DONATION-002] Modal de doação
 **Complexidade:** M
 **Dependências:** DONATION-001, AUTH-001
+**Status:** ✅ Completo
 
 **Como** usuário logado
 **Quero** apoiar um ecoponto com doação
 **Para** contribuir com a iniciativa
 
 **Critérios de Aceitação:**
-- [ ] Botão "Apoiar" no modal do ponto (apenas validated)
-- [ ] Modal com:
-  - Foto e nome do ecoponto
-  - Valores sugeridos: R$ 5, 10, 20
-  - Input custom (min R$ 1)
-  - Total + taxas visíveis
-  - Botão "Gerar QR Code PIX"
-- [ ] Após clicar: chama API Stripe (create Payment Intent)
-- [ ] Exibe QR Code e código PIX (copiar)
-- [ ] Timer de expiração (5 minutos)
-- [ ] Polling para verificar pagamento (5s interval)
-- [ ] Ao confirmar: animação + mensagem sucesso
-- [ ] Link "Comprovante" (download PDF)
+- [x] Botão "Apoiar" no modal do ponto (apenas validated)
+- [x] Modal com:
+  - [x] Nome do ecoponto
+  - [x] Valores sugeridos: R$ 5, 10, 20
+  - [x] Input custom (min R$ 2, max R$ 1000)
+  - [x] Botão "Gerar QR Code PIX"
+- [x] Após clicar: chama API MercadoPago (create payment)
+- [x] Exibe QR Code em base64 e código PIX (copiar)
+- [x] Timer de expiração (5 minutos, calculado via date_of_expiration)
+- [x] Polling para verificar pagamento (5s interval)
+- [x] Ao confirmar: animação + mensagem sucesso
+- [ ] Link "Comprovante" (download PDF) - futuro
 
 **Definição de Pronto:**
-- Fluxo completo funciona
-- QR Code renderiza
-- Confirmação automática
-- UX clara e confiável
+- [x] Fluxo completo funciona
+- [x] QR Code renderiza (imagem base64)
+- [x] Confirmação automática via polling
+- [x] UX clara e confiável
+
+**Notas:**
+- QR Code exibido como imagem base64 (não iframe)
+- 3 passos: seleção de valor → QR code → sucesso
+- Polling a cada 5s verifica status no banco
+- Validação: R$ 2 mínimo, R$ 1000 máximo
 
 ---
 
 ### 💰 [P0-DONATION-003] Sistema de reputação
-**Complexidade:** M  
+**Complexidade:** M
 **Dependências:** DONATION-002, REVIEW-001
+**Status:** ✅ Completo (MVP)
 
-**Como** usuário engajado  
-**Quero** ganhar pontos e badges  
+**Como** usuário engajado
+**Quero** ganhar pontos e badges
 **Para** ser reconhecido na comunidade
 
 **Critérios de Aceitação:**
-- [ ] Tabela user_reputation com:
+- [x] Tabela user_reputation com:
   - points (total de pontos)
   - donations_count, reviews_count
-  - badges (json array)
-- [ ] Regras de pontos:
-  - +10 pontos por doação
-  - +5 pontos por review
-  - +50 pontos por importar ponto validado
-  - +100 pontos por validar próprio ponto
-- [ ] Badges automáticos:
-  - "Apoiador Bronze" (3 doações)
-  - "Apoiador Prata" (10 doações)
-  - "Apoiador Ouro" (25 doações)
-  - "Explorador" (5 reviews)
-  - "Curador" (10 importações validadas)
-- [ ] Atualização via database trigger ou função
-- [ ] Leaderboard: /ranking
-- [ ] Badge visível no perfil e comentários
+  - badges (jsonb array)
+- [x] Regras de pontos:
+  - [x] +10 pontos por doação
+  - [x] +5 pontos por review
+  - [ ] +50 pontos por importar ponto validado (futuro)
+  - [ ] +100 pontos por validar próprio ponto (futuro)
+- [x] Badges automáticos:
+  - [x] "Apoiador Bronze" (3 doações) 🥉
+  - [x] "Apoiador Prata" (10 doações) 🥈
+  - [x] "Apoiador Ouro" (25 doações) 🥇
+  - [x] "Explorador" (5 reviews) 🔍
+  - [ ] "Curador" (10 importações validadas) (futuro)
+- [x] Atualização via database function PostgreSQL
+  - [x] increment_user_reputation() - atualiza pontos atomicamente
+  - [x] update_user_badges() - atribui badges automaticamente
+- [ ] Leaderboard: /ranking (futuro P1)
+- [ ] Badge visível no perfil e comentários (futuro P1)
 
 **Definição de Pronto:**
-- Pontos calculados corretamente
-- Badges atribuídos automaticamente
-- Leaderboard funciona
-- Gamificação engaja
+- [x] Pontos calculados corretamente (+10 por doação)
+- [x] Badges atribuídos automaticamente
+- [ ] Leaderboard funciona (futuro)
+- [x] Sistema integrado com webhook
+
+**Notas:**
+- Função `increment_user_reputation(user_id, points, donation_increment, review_increment)` criada
+- Função `update_user_badges(user_id)` atualiza badges automaticamente
+- Chamado pelo webhook do MercadoPago ao aprovar pagamento
+- Leaderboard e exibição de badges serão em P1
 
 ---
 
@@ -1162,9 +1184,130 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 
 ---
 
-**Última atualização:** 2025-11-17 (atualizado com progresso)
+**Última atualização:** 2025-11-27 (sistema de doações completo)
 **Desenvolvedor:** Julio
 **Contexto:** Vibe Coding com Regen Crypto Commons
+
+---
+
+## 🧪 Como Testar o Sistema de Doações
+
+### Pré-requisitos
+1. Conta no MercadoPago Developers criada
+2. Credenciais de teste configuradas no `.env.local`:
+   - `MERCADOPAGO_ACCESS_TOKEN` (começa com TEST-)
+   - `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY` (começa com TEST-)
+   - `MERCADOPAGO_WEBHOOK_SECRET` (qualquer string secreta)
+
+### Passo a Passo
+
+#### 1. **Preparar o ambiente local**
+```bash
+npm run dev
+```
+
+#### 2. **Fazer login no sistema**
+- Acesse http://localhost:3000
+- Faça login com uma conta existente ou crie uma nova
+
+#### 3. **Encontrar um ecoponto validado**
+- No mapa, procure por um ecoponto com status "validated"
+- Clique no marker para abrir o popup
+- Clique em "Ver Detalhes"
+- O botão "💰 Apoiar" só aparece para ecopontos validados que aceitam doações
+
+#### 4. **Testar o fluxo de doação**
+
+**Passo 1 - Seleção de valor:**
+- Clique em "💰 Apoiar"
+- Escolha um valor sugerido (R$ 5, 10, 20) ou digite um valor personalizado
+- Clique em "Gerar QR Code PIX"
+
+**Passo 2 - QR Code:**
+- O QR Code PIX será exibido (imagem base64)
+- Você verá o código PIX para copiar
+- Timer de 5 minutos começará a contar
+- Sistema faz polling a cada 5 segundos para verificar se o pagamento foi confirmado
+
+**Passo 3 - Pagamento (ambiente de teste):**
+
+**Opção A - Simular pagamento aprovado (mais fácil):**
+1. No terminal, simule o webhook do MercadoPago:
+```bash
+curl -X POST http://localhost:3000/api/webhooks/mercadopago \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "payment",
+    "data": {
+      "id": "ID_DO_PAGAMENTO_AQUI"
+    }
+  }'
+```
+
+**Opção B - Usar ngrok para webhook real:**
+1. Instale ngrok: https://ngrok.com
+2. Execute: `ngrok http 3000`
+3. Configure o webhook no MercadoPago com a URL do ngrok:
+   `https://seu-id.ngrok.io/api/webhooks/mercadopago`
+4. Use o app do MercadoPago em modo teste para pagar o PIX
+5. O webhook será chamado automaticamente
+
+**Passo 4 - Confirmação:**
+- Após o pagamento ser confirmado (via webhook ou polling)
+- Modal automaticamente muda para tela de sucesso 🎉
+- Mensagem: "Doação confirmada! Obrigado por apoiar [Nome do Ecoponto]"
+
+#### 5. **Verificar resultados**
+
+**No banco de dados (Supabase):**
+- Tabela `donations`: deve ter um registro com status 'completed'
+- Tabela `user_reputation`: pontos do usuário devem ter aumentado +10
+
+**No console do navegador:**
+- Logs do polling de status
+- Confirmação da mudança de status
+
+**Logs do servidor:**
+```bash
+# Terminal onde está rodando npm run dev
+Payment succeeded: [payment_id]
+```
+
+### Credenciais de Teste do MercadoPago
+
+**Para testar com app mobile:**
+- Usuário teste: Use o gerador de usuários teste no dashboard do MercadoPago
+- Acesse: https://www.mercadopago.com.br/developers/panel/test-users
+
+**Cartões de teste (para futura implementação de cartão):**
+- **Aprovado**: `5031 4332 1540 6351`
+- **CVV**: 123
+- **Validade**: Qualquer data futura
+- **Nome**: APRO (aprovado) ou OTHE (outro status)
+
+### Troubleshooting
+
+**"QR Code não aparece":**
+- Verifique se o `MERCADOPAGO_ACCESS_TOKEN` está correto no `.env.local`
+- Confira os logs do servidor para erros da API do MercadoPago
+
+**"Polling não detecta pagamento":**
+- Verifique se o webhook está configurado corretamente
+- Confira se o `MERCADOPAGO_WEBHOOK_SECRET` está igual no `.env.local` e no MercadoPago
+- Veja os logs do webhook no terminal
+
+**"Erro ao criar pagamento":**
+- Verifique se o ecoponto tem `accepts_donations = true`
+- Verifique se o ecoponto tem status `validated`
+- Confira os logs da API route `/api/create-payment-intent`
+
+### Próximos Passos
+
+Depois de testar com sucesso:
+1. Configure webhooks de produção no MercadoPago
+2. Troque credenciais de teste por produção
+3. Configure ngrok ou similar para desenvolvimento local
+4. Em produção, use a URL do Netlify para webhooks
 
 ## ✅ Resumo do Progresso
 
@@ -1192,10 +1335,11 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 - ✅ P0-VALIDATE-002 - Formulário de validação (formulário completo com validações)
 - ✅ P0-VALIDATE-003 - Mudança de status para "validated" (status update implementado)
 - ✅ P1-ADMIN-001 - Dashboard do administrador MVP (listar, editar, excluir ecopontos)
+- ✅ P0-DONATION-001 - Integração MercadoPago PIX (QR code, webhook, banco de dados)
+- ✅ P0-DONATION-002 - Modal de doação com fluxo completo (3 passos, polling, timer)
+- ✅ P0-DONATION-003 - Sistema de reputação MVP (pontos, badges automáticos)
 
 **Próximos (P0 - MVP):**
-- P0-DONATION-001 - Integração Stripe PIX
-- P0-DONATION-002 - Modal de doação no mapa
 - P0-REVIEW-001 - Sistema básico de avaliações
 
 **Próximos (P1 - Post-MVP):**

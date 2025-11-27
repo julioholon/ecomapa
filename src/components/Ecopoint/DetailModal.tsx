@@ -155,7 +155,27 @@ export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
           {ecopoint.address && (
             <div className="mb-6">
               <h3 className="mb-2 font-semibold text-gray-900">Endereço</h3>
-              <p className="text-gray-700">{ecopoint.address}</p>
+              <p className="text-gray-700">
+                {(() => {
+                  try {
+                    // Sempre tenta parsear se for string (vem serializado do banco)
+                    const addr = typeof ecopoint.address === 'string'
+                      ? JSON.parse(ecopoint.address)
+                      : ecopoint.address
+
+                    const parts = [
+                      addr.street,
+                      addr.city,
+                      addr.state
+                    ].filter(Boolean)
+
+                    return parts.join(', ')
+                  } catch {
+                    // Se falhar o parse, retorna a string original
+                    return String(ecopoint.address)
+                  }
+                })()}
+              </p>
             </div>
           )}
 
