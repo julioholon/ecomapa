@@ -1328,6 +1328,7 @@ Depois de testar com sucesso:
 - ✅ P0-FILTER-001 - Filtro por categoria
 - ✅ P0-FILTER-002 - Filtro por raio de distância
 - ✅ P0-AUTH-001 - Autenticação (Email/Senha + Google OAuth)
+- ✅ P0-AUTH-002 - Página de cadastro
 - ✅ P0-IMPORT-001 - Interface Google Places (API real com busca e visualização)
 - ✅ P0-IMPORT-002 - Categorização manual (multi-categoria com checkboxes)
 - ✅ P0-IMPORT-003 - Salvar pontos como pending (importação para Supabase)
