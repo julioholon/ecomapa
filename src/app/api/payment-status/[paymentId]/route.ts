@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe/config'
 import { createClient } from '@/lib/supabase/server'
+import { paymentClient } from '@/lib/mercadopago/config'
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ paymentIntentId: string }> }
+  { params }: { params: Promise<{ paymentId: string }> }
 ) {
   try {
-    const { paymentIntentId } = await params
+    const { paymentId } = await params
 
     // Get authenticated user
     const supabase = await createClient()
@@ -23,7 +23,7 @@ export async function GET(
     const { data: donation, error: donationError } = await supabase
       .from('donations')
       .select('*')
-      .eq('payment_id', paymentIntentId)
+      .eq('payment_id', paymentId)
       .eq('user_id', user.id)
       .single()
 
@@ -50,32 +50,21 @@ export async function GET(
       })
     }
 
-    // Otherwise, check Stripe for the latest status
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
+    // Otherwise, check MercadoPago for the latest status
+    const payment = await paymentClient.get({ id: Number(paymentId) })
 
-    // Get PIX payment details if available
-    let pixDetails = null
-    if (
-      paymentIntent.status === 'requires_action' &&
-      paymentIntent.next_action?.type === 'pix_display_qr_code' &&
-      paymentIntent.next_action.pix_display_qr_code
-    ) {
-      const pixData = paymentIntent.next_action.pix_display_qr_code as {
-        hosted_voucher_url?: string
-        data?: string
-        expires_at?: number
-      }
-      pixDetails = {
-        qrCode: pixData.hosted_voucher_url || null,
-        pixCode: pixData.data || null,
-        expiresAt: pixData.expires_at || null,
-      }
+    // Map MercadoPago status to our status
+    let status = 'pending'
+    if (payment.status === 'approved') {
+      status = 'completed'
+    } else if (payment.status === 'rejected' || payment.status === 'cancelled') {
+      status = 'failed'
     }
 
     return NextResponse.json({
-      status: paymentIntent.status,
+      status,
       donation: typedDonation,
-      pixDetails,
+      paymentStatus: payment.status,
     })
   } catch (error) {
     console.error('Error checking payment status:', error)

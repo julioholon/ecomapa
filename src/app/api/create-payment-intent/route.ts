@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
-import { stripe, MIN_DONATION_AMOUNT, MAX_DONATION_AMOUNT } from '@/lib/stripe/config'
 import { createClient } from '@/lib/supabase/server'
+import { paymentClient, MIN_DONATION_AMOUNT, MAX_DONATION_AMOUNT } from '@/lib/mercadopago/config'
 
 export async function POST(request: Request) {
   try {
     const { amount, ecopointId } = await request.json()
 
-    // Validate amount
+    // Validate amount (amount is in cents)
     if (!amount || amount < MIN_DONATION_AMOUNT || amount > MAX_DONATION_AMOUNT) {
       return NextResponse.json(
         { error: `Valor deve estar entre R$ 2,00 e R$ 1.000,00` },
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     // Verify ecopoint exists and accepts donations
     const { data: ecopoint, error: ecopointError } = await supabase
       .from('ecopoints')
-      .select('id, name, accepts_donations, status')
+      .select('id, name, status, accepts_donations')
       .eq('id', ecopointId)
       .single()
 
@@ -43,19 +43,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Ecoponto não encontrado' }, { status: 404 })
     }
 
-    // Type assertion for ecopoint data
+    // Type assertion for ecopoint
     const typedEcopoint = ecopoint as {
       id: string
       name: string
       accepts_donations?: boolean
       status: string
-    }
-
-    if (!typedEcopoint.accepts_donations) {
-      return NextResponse.json(
-        { error: 'Este ecoponto não aceita doações' },
-        { status: 400 }
-      )
     }
 
     if (typedEcopoint.status !== 'validated') {
@@ -65,42 +58,64 @@ export async function POST(request: Request) {
       )
     }
 
-    // Create Payment Intent with PIX
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: 'brl',
-      payment_method_types: ['pix'],
-      metadata: {
-        ecopoint_id: ecopointId,
-        ecopoint_name: typedEcopoint.name,
-        user_id: user.id,
-        user_email: user.email || '',
+    if (!typedEcopoint.accepts_donations) {
+      return NextResponse.json(
+        { error: 'Este ecoponto não aceita doações' },
+        { status: 400 }
+      )
+    }
+
+    // Create payment with MercadoPago (PIX)
+    const payment = await paymentClient.create({
+      body: {
+        transaction_amount: amount / 100, // Convert cents to reais
+        description: `Doação para ${typedEcopoint.name}`,
+        payment_method_id: 'pix',
+        payer: {
+          email: user.email || 'doador@ecomapa.com',
+        },
+        metadata: {
+          ecopoint_id: ecopointId,
+          ecopoint_name: typedEcopoint.name,
+          user_id: user.id,
+          user_email: user.email || '',
+        },
       },
-      description: `Doação para ${typedEcopoint.name}`,
     })
 
-    // Create donation record in database (status: pending)
-    const { error: donationError } = await (supabase.from('donations') as ReturnType<typeof supabase.from>).insert({
+    // Create donation record in database
+    const { error: insertError } = await (
+      supabase.from('donations') as ReturnType<typeof supabase.from>
+    ).insert({
       ecopoint_id: ecopointId,
       user_id: user.id,
-      amount: amount / 100, // Convert cents to reais
-      payment_id: paymentIntent.id,
+      amount: amount / 100,
+      payment_id: payment.id?.toString() || '',
       status: 'pending',
     } as Record<string, unknown>)
 
-    if (donationError) {
-      console.error('Error creating donation record:', donationError)
-      // Don't fail the payment intent, just log the error
+    if (insertError) {
+      console.error('Error creating donation record:', insertError)
+      return NextResponse.json(
+        { error: 'Erro ao criar registro de doação' },
+        { status: 500 }
+      )
     }
 
+    // Extract PIX information
+    const pixData = payment.point_of_interaction?.transaction_data
+
     return NextResponse.json({
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
+      paymentId: payment.id?.toString(),
+      qrCode: pixData?.qr_code || null,
+      qrCodeBase64: pixData?.qr_code_base64 || null,
+      ticketUrl: pixData?.ticket_url || null,
+      expiresAt: payment.date_of_expiration || null,
     })
   } catch (error) {
-    console.error('Error creating payment intent:', error)
+    console.error('Error creating payment:', error)
     return NextResponse.json(
-      { error: 'Erro ao criar intenção de pagamento' },
+      { error: 'Erro ao criar pagamento' },
       { status: 500 }
     )
   }

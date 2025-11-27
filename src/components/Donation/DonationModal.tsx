@@ -24,10 +24,10 @@ export default function DonationModal({ ecopoint, isOpen, onClose }: DonationMod
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [step, setStep] = useState<'select' | 'qrcode' | 'success'>('select')
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
-  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null)
+  const [paymentId, setPaymentId] = useState<string | null>(null)
+  const [qrCodeBase64, setQrCodeBase64] = useState<string | null>(null)
   const [pixCode, setPixCode] = useState<string | null>(null)
-  const [expiresAt, setExpiresAt] = useState<number | null>(null)
+  const [expiresAt, setExpiresAt] = useState<string | null>(null)
   const [timeLeft, setTimeLeft] = useState<number>(300) // 5 minutes
 
   // Reset state when modal opens/closes
@@ -39,8 +39,8 @@ export default function DonationModal({ ecopoint, isOpen, onClose }: DonationMod
         setAmount(10)
         setCustomAmount('')
         setError(null)
-        setPaymentIntentId(null)
-        setQrCodeUrl(null)
+        setPaymentId(null)
+        setQrCodeBase64(null)
         setPixCode(null)
         setExpiresAt(null)
         setTimeLeft(300)
@@ -50,14 +50,14 @@ export default function DonationModal({ ecopoint, isOpen, onClose }: DonationMod
 
   // Poll payment status
   useEffect(() => {
-    if (!paymentIntentId || step !== 'qrcode') return
+    if (!paymentId || step !== 'qrcode') return
 
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`/api/payment-status/${paymentIntentId}`)
+        const response = await fetch(`/api/payment-status/${paymentId}`)
         const data = await response.json()
 
-        if (data.status === 'succeeded' || data.status === 'completed') {
+        if (data.status === 'completed') {
           setStep('success')
           clearInterval(interval)
         }
@@ -67,15 +67,16 @@ export default function DonationModal({ ecopoint, isOpen, onClose }: DonationMod
     }, 5000) // Poll every 5 seconds
 
     return () => clearInterval(interval)
-  }, [paymentIntentId, step])
+  }, [paymentId, step])
 
   // Countdown timer
   useEffect(() => {
     if (step !== 'qrcode' || !expiresAt) return
 
     const interval = setInterval(() => {
-      const now = Math.floor(Date.now() / 1000)
-      const remaining = expiresAt - now
+      const now = Date.now()
+      const expiresAtMs = new Date(expiresAt).getTime()
+      const remaining = Math.floor((expiresAtMs - now) / 1000)
 
       if (remaining <= 0) {
         setError('QR Code expirou. Por favor, tente novamente.')
@@ -134,20 +135,16 @@ export default function DonationModal({ ecopoint, isOpen, onClose }: DonationMod
         throw new Error(data.error || 'Erro ao criar pagamento')
       }
 
-      setPaymentIntentId(data.paymentIntentId)
-
-      // Get QR Code details
-      const statusResponse = await fetch(`/api/payment-status/${data.paymentIntentId}`)
-      const statusData = await statusResponse.json()
-
-      if (statusData.pixDetails) {
-        setQrCodeUrl(statusData.pixDetails.qrCode)
-        setPixCode(statusData.pixDetails.pixCode)
-        setExpiresAt(statusData.pixDetails.expiresAt)
-        setStep('qrcode')
-      } else {
+      // MercadoPago returns the QR code data directly
+      if (!data.paymentId || !data.qrCode) {
         throw new Error('QR Code PIX não disponível')
       }
+
+      setPaymentId(data.paymentId)
+      setQrCodeBase64(data.qrCodeBase64)
+      setPixCode(data.qrCode)
+      setExpiresAt(data.expiresAt)
+      setStep('qrcode')
     } catch (err: unknown) {
       console.error('Error creating payment:', err)
       setError(err instanceof Error ? err.message : 'Erro ao criar pagamento')
@@ -241,7 +238,7 @@ export default function DonationModal({ ecopoint, isOpen, onClose }: DonationMod
             </button>
 
             <p className="mt-4 text-center text-xs text-gray-500">
-              Pagamento seguro via Stripe PIX
+              Pagamento seguro via MercadoPago PIX
             </p>
           </>
         )}
@@ -253,11 +250,11 @@ export default function DonationModal({ ecopoint, isOpen, onClose }: DonationMod
             <p className="mb-4 text-sm text-gray-600">Use seu app de banco para pagar</p>
 
             <div className="mb-4 rounded-lg bg-gray-100 p-4 text-center">
-              {qrCodeUrl ? (
-                <iframe
-                  src={qrCodeUrl}
-                  title="QR Code PIX"
-                  className="mx-auto h-64 w-64 rounded border"
+              {qrCodeBase64 ? (
+                <img
+                  src={`data:image/png;base64,${qrCodeBase64}`}
+                  alt="QR Code PIX"
+                  className="mx-auto h-64 w-64 rounded border bg-white"
                 />
               ) : (
                 <div className="h-64 w-64 mx-auto flex items-center justify-center">

@@ -12,7 +12,7 @@ EcoMapa torna visível a rede de ecopontos (feiras ecológicas, hortas comunitá
 - **Mapa**: Leaflet + React-Leaflet + Markercluster
 - **Backend**: Supabase (PostgreSQL + PostGIS)
 - **Auth**: Supabase Auth (Email/Senha + Google OAuth)
-- **Pagamentos**: Stripe (PIX + Cartão de Crédito)
+- **Pagamentos**: MercadoPago (PIX + Cartão de Crédito)
 - **Hosting**: Netlify
 
 ## Setup
@@ -86,10 +86,10 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 VALIDATION_TOKEN_SECRET=sua_string_secreta_aqui
 VALIDATION_TOKEN_EXPIRATION_DAYS=90
 
-# Stripe (obrigatório - para doações via PIX e cartão)
-STRIPE_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
+# MercadoPago (obrigatório - para doações via PIX e cartão)
+MERCADOPAGO_ACCESS_TOKEN=APP_USR-...
+NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY=APP_USR-...
+MERCADOPAGO_WEBHOOK_SECRET=sua_chave_secreta_webhook
 ```
 
 
@@ -129,55 +129,59 @@ Para enviar emails de validação aos ecopontos importados:
 
 **Nota**: Resend oferece 3.000 emails/mês no plano gratuito. Perfeito para começar!
 
-#### Obter Chaves do Stripe (obrigatório)
+#### Obter Chaves do MercadoPago (obrigatório)
 
 Para aceitar doações via PIX e cartão de crédito:
 
-1. **Criar conta no Stripe**:
-   - Acesse [Stripe](https://stripe.com/br) e crie uma conta
-   - Complete o processo de cadastro (pode começar sem verificar, usando modo teste)
+1. **Criar conta no MercadoPago**:
+   - Acesse [MercadoPago Developers](https://www.mercadopago.com.br/developers) e crie uma conta
+   - Complete o processo de cadastro (conta grátis)
 
-2. **Obter as chaves de API**:
-   - No dashboard do Stripe, vá em **Developers > API keys**
-   - Você verá duas chaves no modo **Test**:
-     - **Publishable key** (começa com `pk_test_...`) → Copie para `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
-     - **Secret key** (começa com `sk_test_...`) → Copie para `STRIPE_SECRET_KEY`
-   - ⚠️ **Nunca** exponha a Secret key no código frontend!
+2. **Criar uma aplicação**:
+   - No dashboard, vá em **Suas integrações > Criar aplicação**
+   - Escolha um nome (ex: "EcoMapa")
+   - Selecione **Pagamentos online** como solução
+   - Clique em **Criar aplicação**
 
-3. **Habilitar PIX**:
-   - Vá em **Settings > Payment methods**
-   - Procure por **PIX** e ative
-   - PIX funciona automaticamente no modo teste do Stripe
+3. **Obter as credenciais**:
+   - Na sua aplicação, vá em **Credenciais de produção** ou **Credenciais de teste**
+   - Você verá duas chaves:
+     - **Public key** (começa com `APP_USR-...`) → Copie para `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY`
+     - **Access token** (começa com `APP_USR-...`) → Copie para `MERCADOPAGO_ACCESS_TOKEN`
+   - ⚠️ **Nunca** exponha o Access token no código frontend!
 
-4. **Configurar Webhook** (importante para confirmar pagamentos):
-   - Vá em **Developers > Webhooks**
-   - Clique em **Add endpoint**
-   - **Endpoint URL**:
-     - Desenvolvimento: `http://localhost:3000/api/webhooks/stripe`
-     - Produção: `https://seu-site.netlify.app/api/webhooks/stripe`
-   - **Events to send**: Selecione os seguintes eventos:
-     - `payment_intent.succeeded`
-     - `payment_intent.payment_failed`
-     - `payment_intent.canceled`
-   - Clique em **Add endpoint**
-   - Copie o **Signing secret** (começa com `whsec_...`) → Adicione ao `.env.local` como `STRIPE_WEBHOOK_SECRET`
+4. **PIX está habilitado por padrão**:
+   - O MercadoPago já vem com PIX ativado automaticamente
+   - Não precisa fazer configuração adicional
+   - Funciona imediatamente no modo teste e produção
 
-5. **Testar pagamentos PIX no modo teste**:
-   - Use as [credenciais de teste do Stripe](https://stripe.com/docs/testing)
-   - Para PIX, o Stripe exibe um QR code de teste que você pode "pagar" instantaneamente
-   - Para cartões, use números de teste: `4242 4242 4242 4242` (Visa válido)
+5. **Configurar Webhook** (importante para confirmar pagamentos):
+   - Na sua aplicação, vá em **Webhooks**
+   - Clique em **Configurar notificações**
+   - **URL de notificação**:
+     - Desenvolvimento: Use [ngrok](https://ngrok.com) ou similar: `https://seu-id.ngrok.io/api/webhooks/mercadopago`
+     - Produção: `https://seu-site.netlify.app/api/webhooks/mercadopago`
+   - **Eventos**: Selecione **Pagamentos**
+   - Copie uma string secreta qualquer e adicione ao `.env.local` como `MERCADOPAGO_WEBHOOK_SECRET`
+   - Salve a configuração
 
-6. **Produção** (quando estiver pronto):
-   - Complete a verificação da conta no Stripe
-   - Troque as chaves de teste (`pk_test_`, `sk_test_`) pelas chaves de produção (`pk_live_`, `sk_live_`)
+6. **Testar pagamentos no modo teste**:
+   - Use as [credenciais de teste do MercadoPago](https://www.mercadopago.com.br/developers/pt/docs/checkout-api/testing)
+   - Para PIX: Use o app do MercadoPago ou carteiras de teste
+   - Para cartões: Use os números de teste fornecidos na documentação
+   - **Cartão aprovado**: `5031 4332 1540 6351` - CVV: 123 - Validade: qualquer data futura
+
+7. **Produção** (quando estiver pronto):
+   - Troque as **Credenciais de teste** pelas **Credenciais de produção** no `.env.local`
    - Atualize o webhook endpoint para a URL de produção
-   - Configure as taxas e recebimentos em **Settings > Business settings**
+   - Verificação da conta acontece automaticamente conforme você recebe pagamentos
 
 **Notas importantes**:
-- O Stripe cobra 3,99% + R$ 0,39 por transação com PIX no Brasil
+- O MercadoPago cobra **2,49% + R$ 0,39** por transação com PIX (mais barato que Stripe!)
 - Para cartões de crédito: 4,99% + R$ 0,39 por transação
 - Modo teste é gratuito e ilimitado
 - Webhooks são **essenciais** para o fluxo de doações funcionar corretamente
+- PIX no MercadoPago funciona imediatamente, sem lista de espera
 
 ### 4. Rodar em Desenvolvimento
 
@@ -199,9 +203,9 @@ Abra [http://localhost:3000](http://localhost:3000) no navegador.
    - `EMAIL_FROM` (obrigatório)
    - `NEXT_PUBLIC_SITE_URL` (use sua URL do Netlify, ex: https://ecomapa.netlify.app)
    - `VALIDATION_TOKEN_SECRET` (recomendado para produção)
-   - `STRIPE_SECRET_KEY` (obrigatório - use chave de produção)
-   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (obrigatório - use chave de produção)
-   - `STRIPE_WEBHOOK_SECRET` (obrigatório - do endpoint de produção)
+   - `MERCADOPAGO_ACCESS_TOKEN` (obrigatório - use credencial de produção)
+   - `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY` (obrigatório - use credencial de produção)
+   - `MERCADOPAGO_WEBHOOK_SECRET` (obrigatório)
 4. Deploy automático acontece a cada push para `main`
 
 ### 6. Fazer Deploy (Push para Netlify)
@@ -242,9 +246,9 @@ O Netlify detectará o push e iniciará o build automaticamente. Você pode acom
 src/
 ├── app/              # App Router (páginas e rotas)
 │   ├── api/          # API Routes
-│   │   ├── create-payment-intent/    # Criar Payment Intent (PIX/Cartão)
+│   │   ├── create-payment-intent/    # Criar pagamento (PIX/Cartão)
 │   │   ├── payment-status/           # Polling de status de pagamento
-│   │   ├── webhooks/stripe/          # Webhook Stripe (confirmação)
+│   │   ├── webhooks/mercadopago/     # Webhook MercadoPago (confirmação)
 │   │   ├── send-validation-email/    # Enviar email de validação
 │   │   └── verify-token/             # Verificar token HMAC
 │   ├── login/        # Autenticação
@@ -263,7 +267,7 @@ src/
 ├── hooks/            # Custom hooks (geolocation, ecopoints)
 └── lib/
     ├── supabase/     # Cliente e tipos Supabase
-    ├── stripe/       # Configuração Stripe
+    ├── mercadopago/  # Configuração MercadoPago
     └── constants/    # Categorias e config
 ```
 
