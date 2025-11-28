@@ -636,7 +636,7 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 **Para** gerenciar minha conta
 
 **Critérios de Aceitação:**
-- [x] Página /perfil criada
+- [x] Página /dashboard/perfil criada
 - [x] Exibe:
   - [x] Avatar (inicial do nome)
   - [x] Nome

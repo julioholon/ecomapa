@@ -17,7 +17,7 @@ interface Donation {
 }
 
 export default function PerfilPage() {
-  const { user, loading: authLoading, signOut } = useAuth()
+  const { user, signOut } = useAuth()
   const router = useRouter()
   const [editing, setEditing] = useState(false)
   const [changingPassword, setChangingPassword] = useState(false)
@@ -28,12 +28,6 @@ export default function PerfilPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login?redirect=/perfil')
-    }
-  }, [user, authLoading, router])
 
   useEffect(() => {
     if (user) {
@@ -138,15 +132,9 @@ export default function PerfilPage() {
     router.push('/')
   }
 
-  if (authLoading || !user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-green-500 border-t-transparent mx-auto" />
-          <p className="text-gray-600">Carregando...</p>
-        </div>
-      </div>
-    )
+  // Dashboard layout already handles auth, but add safety check
+  if (!user) {
+    return null
   }
 
   const totalDonated = donations

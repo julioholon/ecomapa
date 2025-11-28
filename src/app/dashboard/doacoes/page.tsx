@@ -356,7 +356,7 @@ export default function DoacoesPage() {
             Meus Ecopontos
           </Link>
           <Link
-            href="/perfil"
+            href="/dashboard/perfil"
             className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
           >
             Meu Perfil
