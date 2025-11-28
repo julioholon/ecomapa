@@ -627,32 +627,34 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 ---
 
 ### 🔐 [P1-AUTH-003] Perfil do usuário
-**Complexidade:** M  
+**Complexidade:** M
 **Dependências:** AUTH-001
+**Status:** ✅ Completo (MVP)
 
-**Como** usuário logado  
-**Quero** ver e editar meu perfil  
+**Como** usuário logado
+**Quero** ver e editar meu perfil
 **Para** gerenciar minha conta
 
 **Critérios de Aceitação:**
-- [ ] Página /dashboard/perfil
-- [ ] Exibe:
-  - Avatar (upload ou Gravatar)
-  - Nome
-  - Email (não editável)
-  - Bio (opcional)
-  - Reputação: pontos, badges
-  - Histórico: doações, reviews
-- [ ] Edit mode para atualizar dados
-- [ ] Upload de avatar (Supabase Storage)
-- [ ] Validação de formulário
-- [ ] Botão "Deletar Conta" (com confirmação)
-- [ ] Lista de pontos que administra
+- [x] Página /perfil criada
+- [x] Exibe:
+  - [x] Avatar (inicial do nome)
+  - [x] Nome
+  - [x] Email (não editável)
+  - [x] Estatísticas de doações
+  - [x] Histórico: doações
+- [x] Edit mode para atualizar nome
+- [x] Troca de senha
+- [x] Botão de logout
+- [x] Links rápidos (Meus Ecopontos, Importar)
+- [ ] Upload de avatar (futuro)
+- [ ] Deletar conta (futuro)
 
 **Definição de Pronto:**
-- Edição funciona
-- Avatar upload OK
-- Reputação calculada corretamente
+- [x] Edição de nome funciona
+- [x] Troca de senha funciona
+- [x] Histórico de doações exibido
+- [x] Estatísticas calculadas
 
 ---
 
@@ -1340,6 +1342,7 @@ Depois de testar com sucesso:
 - ✅ P0-DONATION-001 - Integração MercadoPago PIX (QR code, webhook, banco de dados)
 - ✅ P0-DONATION-002 - Modal de doação com fluxo completo (3 passos, polling, timer)
 - ✅ P0-DONATION-003 - Sistema de reputação MVP (pontos, badges automáticos)
+- ✅ P1-AUTH-003 - Perfil do usuário (visualizar, editar nome, trocar senha, histórico doações)
 
 **Próximos (P0 - MVP):**
 - P0-REVIEW-001 - Sistema básico de avaliações
@@ -1399,7 +1402,7 @@ gantt
     section Autenticação
     Login Email/Google         :done, auth1, 2024-11-17, 1d
     Página de cadastro         :done, auth2, 2024-11-17, 1d
-    Perfil do usuário          :auth3, 2024-11-20, 2d
+    Perfil do usuário          :done, auth3, 2024-11-27, 1d
 
     section Importação
     Interface Google Maps      :done, import1, 2024-11-17, 1d
@@ -1413,9 +1416,9 @@ gantt
     Mudança de status          :done, valid3, 2024-11-25, 1d
 
     section Doações
-    Integração Stripe PIX      :donation1, 2024-11-29, 5d
-    Modal de doação            :donation2, 2024-12-04, 3d
-    Sistema de reputação       :donation3, 2024-12-07, 3d
+    Integração MercadoPago PIX :done, donation1, 2024-11-25, 1d
+    Modal de doação            :done, donation2, 2024-11-25, 1d
+    Sistema de reputação       :done, donation3, 2024-11-25, 1d
 
     section Reviews
     Adicionar avaliação        :review1, 2024-12-10, 3d
