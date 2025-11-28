@@ -73,6 +73,20 @@ export default function Header() {
                   >
                     Meus Pontos
                   </Link>
+                  <Link
+                    href="/dashboard/doacoes"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setShowMenu(false)}
+                  >
+                    💰 Doações Recebidas
+                  </Link>
+                  <Link
+                    href="/dashboard/solicitar-saque"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setShowMenu(false)}
+                  >
+                    💸 Solicitar Saque
+                  </Link>
                   <button
                     onClick={handleSignOut}
                     className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100"

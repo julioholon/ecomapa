@@ -348,7 +348,13 @@ export default function DoacoesPage() {
         )}
 
         {/* Quick Links */}
-        <div className="mt-8 flex justify-center gap-4">
+        <div className="mt-8 flex justify-center gap-4 flex-wrap">
+          <Link
+            href="/dashboard/solicitar-saque"
+            className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+          >
+            💸 Solicitar Saque
+          </Link>
           <Link
             href="/dashboard/meus-pontos"
             className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
@@ -363,7 +369,7 @@ export default function DoacoesPage() {
           </Link>
           <Link
             href="/"
-            className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+            className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
           >
             Voltar ao Mapa
           </Link>
