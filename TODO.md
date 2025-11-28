@@ -1031,7 +1031,230 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 
 ---
 
+### 💰 [P0-DONATION-005] Sistema de saque de doações
+**Complexidade:** L
+**Dependências:** DONATION-001, DONATION-004
+**Status:** ❌ Pendente
+**Prioridade:** 🔴 CRÍTICO - MVP BLOQUEADOR
+
+**Como** proprietário de ecoponto
+**Quero** solicitar saque das doações recebidas
+**Para** receber o dinheiro na minha conta
+
+**Contexto:**
+Atualmente as doações são recebidas via MercadoPago, mas ficam "presas" sem forma do proprietário receber. Este é um MVP bloqueador crítico.
+
+**Critérios de Aceitação:**
+
+**1. Tabela de Saques (withdrawals):**
+- [ ] Schema no banco de dados:
+  ```sql
+  CREATE TABLE withdrawals (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    ecopoint_id uuid NOT NULL REFERENCES ecopoints(id),
+    user_id uuid NOT NULL REFERENCES auth.users(id),
+    amount_gross decimal(10,2) NOT NULL,      -- Valor bruto (100%)
+    platform_fee decimal(10,2) NOT NULL,      -- Taxa da plataforma (10%)
+    amount_net decimal(10,2) NOT NULL,        -- Valor líquido (90%)
+    pix_key text NOT NULL,                    -- Chave PIX do destinatário
+    pix_key_type text NOT NULL,               -- Tipo: CPF, CNPJ, EMAIL, PHONE, RANDOM
+    status withdrawal_status DEFAULT 'pending',
+    admin_notes text,                         -- Notas do admin
+    processed_by uuid REFERENCES auth.users(id),
+    processed_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now()
+  );
+
+  CREATE TYPE withdrawal_status AS ENUM ('pending', 'processing', 'completed', 'rejected');
+  ```
+- [ ] RLS policies apropriadas
+- [ ] Índices para performance
+
+**2. Página de Solicitação de Saque (/dashboard/solicitar-saque):**
+- [ ] Exibe saldo disponível para saque:
+  - Total de doações recebidas (completed)
+  - Menos saques já realizados
+  - Saldo disponível destacado
+- [ ] Formulário de solicitação:
+  - [ ] Input: Valor a sacar (validar se não excede disponível)
+  - [ ] Select: Tipo de chave PIX (CPF, CNPJ, Email, Telefone, Aleatória)
+  - [ ] Input: Chave PIX (validar formato baseado no tipo)
+  - [ ] Select: Ecoponto (se usuário tem múltiplos)
+  - [ ] Cálculo automático mostrando:
+    * Valor solicitado: R$ X.XX
+    * Taxa da plataforma (10%): R$ Y.YY
+    * Você receberá: R$ Z.ZZ (90%)
+  - [ ] Checkbox: "Confirmo que a chave PIX está correta"
+  - [ ] Botão: "Solicitar Saque"
+- [ ] Validações:
+  - Valor mínimo: R$ 10,00
+  - Formato da chave PIX correto
+  - Saldo suficiente
+- [ ] Histórico de saques anteriores:
+  - Data, valor, status, chave PIX
+  - Filtro por status
+
+**3. API Endpoint para Processar Saque:**
+- [ ] POST /api/withdrawals/request
+  - Valida saldo disponível
+  - Calcula taxa de 10%
+  - Cria registro na tabela withdrawals
+  - Envia emails (ver item 4)
+  - Retorna sucesso/erro
+
+**4. Sistema de Notificações por Email:**
+- [ ] Email para o proprietário do ecoponto:
+  - **Assunto:** "💸 Saque solicitado com sucesso - EcoMapa"
+  - **Corpo HTML:**
+    * Nome do ecoponto
+    * Valor solicitado (bruto)
+    * Taxa da plataforma (10%)
+    * Valor líquido que receberá (90%)
+    * Chave PIX informada
+    * Prazo: 24 a 48 horas úteis
+    * Link para acompanhar em /dashboard/solicitar-saque
+  - Template bonito com React Email
+
+- [ ] Email para o admin do site (process.env.EMAIL_FROM):
+  - **Assunto:** "🚨 AÇÃO NECESSÁRIA: Novo saque pendente - EcoMapa"
+  - **Corpo HTML:**
+    * Dados do ecoponto (nome, ID)
+    * Dados do proprietário (nome, email)
+    * Valor bruto da doação
+    * Taxa retida (10%): R$ X.XX
+    * **Valor a transferir (90%): R$ Y.YY**
+    * Chave PIX destino
+    * Tipo da chave PIX
+    * Data da solicitação
+    * Botão/link para marcar como processado (futuro)
+  - Formato claro para facilitar processo manual
+  - Copiar chave PIX facilmente
+
+**5. RPC Functions / Database Functions:**
+- [ ] `get_available_balance(ecopoint_id uuid)` RETURNS decimal:
+  - Soma donations completed
+  - Menos withdrawals completed
+  - Retorna saldo disponível
+
+- [ ] `create_withdrawal_request(...)` RETURNS uuid:
+  - Valida saldo
+  - Calcula taxas
+  - Insere withdrawal
+  - Retorna ID do withdrawal
+
+**6. Segurança e Validações:**
+- [ ] Apenas owner do ecoponto pode solicitar saque
+- [ ] Validar CPF/CNPJ se tipo for CPF/CNPJ
+- [ ] Validar formato de email/telefone
+- [ ] Limite de 1 saque pendente por ecoponto
+- [ ] Log de todas as solicitações
+- [ ] Rate limiting (máx 5 requests/minuto)
+
+**7. Dashboard Admin (Futuro - P1):**
+- [ ] Listagem de saques pendentes
+- [ ] Marcar como processado
+- [ ] Upload de comprovante
+- [ ] Rejeitar com motivo
+
+**Implementação Técnica:**
+```typescript
+// Estrutura do withdrawal
+interface Withdrawal {
+  id: string
+  ecopoint_id: string
+  user_id: string
+  amount_gross: number    // 100%
+  platform_fee: number    // 10% de amount_gross
+  amount_net: number      // 90% de amount_gross
+  pix_key: string
+  pix_key_type: 'CPF' | 'CNPJ' | 'EMAIL' | 'PHONE' | 'RANDOM'
+  status: 'pending' | 'processing' | 'completed' | 'rejected'
+  created_at: string
+  processed_at?: string
+}
+
+// Cálculo da taxa
+const PLATFORM_FEE_PERCENTAGE = 0.10  // 10%
+const amount_gross = requestedAmount
+const platform_fee = amount_gross * PLATFORM_FEE_PERCENTAGE
+const amount_net = amount_gross - platform_fee
+```
+
+**Definição de Pronto:**
+- [ ] Proprietário consegue solicitar saque
+- [ ] Saldo calculado corretamente
+- [ ] Taxa de 10% retida
+- [ ] Email enviado para proprietário
+- [ ] Email enviado para admin
+- [ ] Chave PIX validada
+- [ ] Histórico de saques visível
+- [ ] RLS protegendo dados
+- [ ] Admin consegue processar manualmente (via banco/email)
+
+**Notas Importantes:**
+- Por enquanto, processamento é **manual** pelo admin
+- Admin recebe email e faz PIX manualmente
+- No futuro (P1), automatizar com API do MercadoPago ou banco
+- Taxa de 10% cobre custos operacionais da plataforma
+- Valor mínimo R$ 10 evita micro-transações
+
+---
+
 ## ÉPICO 10: Polimento e Extras
+
+### 📧 [P1-NOTIFICATION-001] Sistema de notificações por email
+**Complexidade:** M
+**Dependências:** DONATION-002, REVIEW-001, VALIDATE-003
+**Status:** ❌ Pendente
+
+**Como** proprietário de ecoponto
+**Quero** receber emails quando algo importante acontece
+**Para** acompanhar meu ecoponto e engajar com a comunidade
+
+**Critérios de Aceitação:**
+- [ ] Email quando ponto recebe doação:
+  - Assunto: "💰 Você recebeu uma doação no EcoMapa!"
+  - Corpo: Nome do ponto, valor, data, total recebido
+  - Link para /dashboard/doacoes
+  - Template HTML + texto plano
+- [ ] Email quando ponto recebe review/avaliação:
+  - Assunto: "⭐ Nova avaliação no seu ecoponto!"
+  - Corpo: Nome do ponto, nota, comentário, autor
+  - Link para o ecoponto no mapa
+  - Template HTML + texto plano
+- [ ] Email quando ponto é validado:
+  - Assunto: "✅ Seu ecoponto foi validado!"
+  - Corpo: Nome do ponto, link para visualizar no mapa
+  - Template HTML + texto plano
+- [ ] Sistema de templates:
+  - React Email ou similar para templates
+  - Versionamento de templates
+  - Preview de emails antes de enviar
+- [ ] Integração com serviço de email:
+  - Resend (já configurado)
+  - Retry automático em caso de falha
+  - Log de emails enviados
+- [ ] Preferências de notificação (futuro):
+  - [ ] Checkbox no perfil para desabilitar notificações
+  - [ ] Frequência: instantâneo, diário, semanal
+
+**Implementação Técnica:**
+- Webhook do MercadoPago chama função para enviar email de doação
+- Trigger do banco ao inserir review chama API que envia email
+- Função de validação já envia email (expandir template)
+- Usar queue (opcional) para não bloquear requests
+
+**Definição de Pronto:**
+- [x] Email de validação já funciona (P0-IMPORT-004)
+- [ ] Email de doação implementado e testado
+- [ ] Email de review implementado e testado
+- [ ] Templates bonitos e responsivos
+- [ ] Emails não vão para spam
+- [ ] Taxa de entrega >95%
+
+**Prioridade:** ALTA - sem isso, proprietários não sabem que receberam doações/reviews!
+
+---
 
 ### 🎨 [P1-UI-001] Design system e componentes
 **Complexidade:** L  
@@ -1356,11 +1579,12 @@ Depois de testar com sucesso:
 - ✅ P1-AUTH-003 - Perfil do usuário (visualizar, editar nome, trocar senha, histórico doações)
 - ✅ P1-DONATION-004 - Dashboard de doações recebidas (estatísticas, listagem por ecoponto, totais)
 
-**Próximos (P0 - MVP):**
+**Próximos (P0 - MVP - CRÍTICO):**
+- 🔴 **P0-DONATION-005** - Sistema de saque de doações (BLOQUEADOR - sem isso proprietários não recebem!)
 - P0-REVIEW-001 - Sistema básico de avaliações
 
-**Próximos (P1 - Post-MVP):**
-- P1-NOTIFICATION-001 - Sistema de notificações (emails de confirmação)
+**Próximos (P1 - Post-MVP - ALTA PRIORIDADE):**
+- **P1-NOTIFICATION-001** - Sistema de notificações por email (doações + reviews) ⚠️ CRÍTICO
 - P1-PHOTO-001 - Upload de fotos de ecopontos
 - P1-REPUTATION-001 - Sistema de reputação completo
 - P2-ADMIN-002 - Dashboard avançado (estatísticas, gráficos, analytics)
