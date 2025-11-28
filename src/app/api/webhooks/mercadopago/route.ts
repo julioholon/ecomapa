@@ -56,13 +56,15 @@ async function handlePaymentSuccess(paymentId: string, metadata: any) {
   const supabase = await createClient()
 
   // Update donation status to 'completed'
-  const { error: updateError } = await (
+  const { data: updatedDonation, error: updateError } = await (
     supabase.from('donations') as ReturnType<typeof supabase.from>
   )
     .update({
       status: 'completed',
     } as Record<string, unknown>)
     .eq('payment_id', paymentId)
+    .select('id')
+    .single()
 
   if (updateError) {
     console.error('Error updating donation:', updateError)
@@ -85,6 +87,30 @@ async function handlePaymentSuccess(paymentId: string, metadata: any) {
     if (reputationError) {
       console.error('Error updating reputation:', reputationError)
       // Don't throw - reputation update is not critical
+    }
+  }
+
+  // Send notification email to ecopoint owner
+  if (updatedDonation?.id) {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/send-donation-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          donation_id: updatedDonation.id,
+        }),
+      })
+
+      if (!response.ok) {
+        console.error('Failed to send donation email:', await response.text())
+      } else {
+        console.log('✅ Donation notification email sent')
+      }
+    } catch (emailError) {
+      console.error('Error sending donation email:', emailError)
+      // Don't throw - email is not critical for payment processing
     }
   }
 
