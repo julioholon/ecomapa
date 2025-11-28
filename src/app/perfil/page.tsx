@@ -400,6 +400,12 @@ export default function PerfilPage() {
                   Meus Ecopontos
                 </Link>
                 <Link
+                  href="/dashboard/doacoes"
+                  className="block rounded-lg border border-gray-200 p-3 text-gray-700 hover:bg-gray-50"
+                >
+                  Doações Recebidas
+                </Link>
+                <Link
                   href="/dashboard/importar"
                   className="block rounded-lg border border-gray-200 p-3 text-gray-700 hover:bg-gray-50"
                 >

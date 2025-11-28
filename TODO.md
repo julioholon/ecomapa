@@ -991,32 +991,43 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 ---
 
 ### 💰 [P1-DONATION-004] Dashboard de doações recebidas
-**Complexidade:** M  
+**Complexidade:** M
 **Dependências:** DONATION-002, VALIDATE-004
+**Status:** ✅ Completo (MVP)
 
-**Como** administrador de ponto  
-**Quero** ver doações que recebi  
+**Como** administrador de ponto
+**Quero** ver doações que recebi
 **Para** acompanhar o apoio da comunidade
 
 **Critérios de Aceitação:**
-- [ ] Seção em /dashboard/meus-pontos
-- [ ] Por ponto, exibe:
-  - Total arrecadado (mês/total)
-  - Número de apoiadores únicos
-  - Doação média
-  - Gráfico de doações por dia (últimos 30d)
-  - Lista de doações:
-    * Data, valor, apoiador (anônimo ou nome)
-    * Status da doação
-- [ ] Filtros: período, status
-- [ ] Export CSV de doações
-- [ ] Projeção: "Se continuar assim, R$ X/mês"
+- [x] Página dedicada /dashboard/doacoes
+- [x] Estatísticas gerais:
+  - [x] Total recebido (todos os pontos)
+  - [x] Número total de doações concluídas
+  - [x] Número de ecopontos ativos
+- [x] Por ecoponto, exibe:
+  - [x] Total arrecadado
+  - [x] Número de doações concluídas
+  - [x] Total de transações
+  - [x] Lista expansível de doações
+- [x] Lista de doações (por ponto):
+  - [x] Data e hora
+  - [x] Valor
+  - [x] Status (Concluída/Pendente/Falhou)
+  - [x] ID do pagamento
+- [x] Link na página /dashboard/meus-pontos
+- [x] Link no perfil do usuário
+- [ ] Gráfico de doações por dia (futuro)
+- [ ] Filtros por período e status (futuro)
+- [ ] Export CSV (futuro)
+- [ ] Número de apoiadores únicos (futuro)
+- [ ] Projeções (futuro)
 
 **Definição de Pronto:**
-- Dados precisos
-- Gráficos informativos
-- Export funciona
-- UX motivadora
+- [x] Dados precisos e em tempo real
+- [x] UX clara e informativa
+- [x] Integração com outros dashboards
+- [ ] Gráficos e análises avançadas (futuro)
 
 ---
 
@@ -1343,6 +1354,7 @@ Depois de testar com sucesso:
 - ✅ P0-DONATION-002 - Modal de doação com fluxo completo (3 passos, polling, timer)
 - ✅ P0-DONATION-003 - Sistema de reputação MVP (pontos, badges automáticos)
 - ✅ P1-AUTH-003 - Perfil do usuário (visualizar, editar nome, trocar senha, histórico doações)
+- ✅ P1-DONATION-004 - Dashboard de doações recebidas (estatísticas, listagem por ecoponto, totais)
 
 **Próximos (P0 - MVP):**
 - P0-REVIEW-001 - Sistema básico de avaliações

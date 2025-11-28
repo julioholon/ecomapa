@@ -127,12 +127,20 @@ export default function MeusPontosPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold text-gray-900">Meus Ecopontos</h1>
-            <button
-              onClick={() => router.push('/dashboard/importar')}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
-            >
-              + Importar Novo
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => router.push('/dashboard/doacoes')}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2"
+              >
+                💰 Ver Doações
+              </button>
+              <button
+                onClick={() => router.push('/dashboard/importar')}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
+              >
+                + Importar Novo
+              </button>
+            </div>
           </div>
           <p className="text-gray-600">
             Gerencie os ecopontos que você administra
