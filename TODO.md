@@ -948,7 +948,7 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 ### 💰 [P0-DONATION-003] Sistema de reputação
 **Complexidade:** M
 **Dependências:** DONATION-002, REVIEW-001
-**Status:** ✅ Completo (MVP)
+**Status:** ✅ Completo
 
 **Como** usuário engajado
 **Quero** ganhar pontos e badges
@@ -962,31 +962,46 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 - [x] Regras de pontos:
   - [x] +10 pontos por doação
   - [x] +5 pontos por review
-  - [ ] +50 pontos por importar ponto validado (futuro)
-  - [ ] +100 pontos por validar próprio ponto (futuro)
+  - [ ] +50 pontos por importar ponto validado (futuro P1)
+  - [ ] +100 pontos por validar próprio ponto (futuro P1)
 - [x] Badges automáticos:
   - [x] "Apoiador Bronze" (3 doações) 🥉
   - [x] "Apoiador Prata" (10 doações) 🥈
   - [x] "Apoiador Ouro" (25 doações) 🥇
   - [x] "Explorador" (5 reviews) 🔍
-  - [ ] "Curador" (10 importações validadas) (futuro)
+  - [ ] "Curador" (10 importações validadas) (futuro P1)
 - [x] Atualização via database function PostgreSQL
   - [x] increment_user_reputation() - atualiza pontos atomicamente
   - [x] update_user_badges() - atribui badges automaticamente
+- [x] Visualização no perfil do usuário:
+  - [x] Exibição de pontos totais
+  - [x] Badges conquistadas com ícones emoji
+  - [x] Barra de progresso para próxima badge
+  - [x] Contador de doações e avaliações
 - [ ] Leaderboard: /ranking (futuro P1)
-- [ ] Badge visível no perfil e comentários (futuro P1)
+- [ ] Badge visível em comentários/reviews (futuro P1)
 
 **Definição de Pronto:**
 - [x] Pontos calculados corretamente (+10 por doação)
 - [x] Badges atribuídos automaticamente
-- [ ] Leaderboard funciona (futuro)
+- [x] Badges visíveis no perfil do usuário
+- [x] Barra de progresso funcionando
+- [ ] Leaderboard funciona (futuro P1)
 - [x] Sistema integrado com webhook
 
 **Notas:**
 - Função `increment_user_reputation(user_id, points, donation_increment, review_increment)` criada
 - Função `update_user_badges(user_id)` atualiza badges automaticamente
 - Chamado pelo webhook do MercadoPago ao aprovar pagamento
-- Leaderboard e exibição de badges serão em P1
+- Visualização implementada em `/dashboard/perfil` com card dedicado de reputação
+- Progress bar mostra caminho até próxima badge (Bronze → Prata → Ouro)
+- Leaderboard será implementado em P1
+
+**Arquivos Criados/Modificados:**
+- `/supabase/migrations/20241116170001_initial_schema.sql` - Tabela user_reputation
+- `/supabase/migrations/20251125144000_add_reputation_functions.sql` - RPC functions
+- `/src/app/api/webhooks/mercadopago/route.ts` - Integração com webhook
+- `/src/app/dashboard/perfil/page.tsx` - UI de visualização de reputação ✅ NOVO
 
 ---
 
@@ -1612,8 +1627,8 @@ Depois de testar com sucesso:
 - ✅ P1-ADMIN-001 - Dashboard do administrador MVP (listar, editar, excluir ecopontos)
 - ✅ P0-DONATION-001 - Integração MercadoPago PIX (QR code, webhook, banco de dados)
 - ✅ P0-DONATION-002 - Modal de doação com fluxo completo (3 passos, polling, timer)
-- ✅ P0-DONATION-003 - Sistema de reputação MVP (pontos, badges automáticos)
-- ✅ P1-AUTH-003 - Perfil do usuário (visualizar, editar nome, trocar senha, histórico doações)
+- ✅ P0-DONATION-003 - Sistema de reputação completo (pontos, badges, visualização)
+- ✅ P1-AUTH-003 - Perfil do usuário (visualizar, editar nome, trocar senha, histórico doações, reputação)
 - ✅ P1-DONATION-004 - Dashboard de doações recebidas (estatísticas, listagem por ecoponto, totais)
 - ✅ P0-DONATION-005 - Sistema de saque de doações (página + API + emails + migration SQL)
 
@@ -1691,7 +1706,9 @@ gantt
     section Doações
     Integração MercadoPago PIX :done, donation1, 2024-11-25, 1d
     Modal de doação            :done, donation2, 2024-11-25, 1d
-    Sistema de reputação       :done, donation3, 2024-11-25, 1d
+    Sistema de reputação       :done, donation3, 2024-11-25, 3d
+    Dashboard doações recebidas:done, donation4, 2024-11-27, 1d
+    Sistema de saques          :done, donation5, 2024-11-28, 1d
 
     section Reviews
     Adicionar avaliação        :review1, 2024-12-10, 3d

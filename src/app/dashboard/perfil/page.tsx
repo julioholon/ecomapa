@@ -16,6 +16,20 @@ interface Donation {
   }
 }
 
+interface Badge {
+  id: string
+  name: string
+  icon: string
+  earned_at: string
+}
+
+interface UserReputation {
+  points: number
+  donations_count: number
+  reviews_count: number
+  badges: Badge[]
+}
+
 export default function PerfilPage() {
   const { user, signOut } = useAuth()
   const router = useRouter()
@@ -25,6 +39,7 @@ export default function PerfilPage() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [donations, setDonations] = useState<Donation[]>([])
+  const [reputation, setReputation] = useState<UserReputation | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -33,6 +48,7 @@ export default function PerfilPage() {
     if (user) {
       setName(user.user_metadata?.full_name || '')
       fetchDonations()
+      fetchReputation()
     }
   }, [user])
 
@@ -61,6 +77,44 @@ export default function PerfilPage() {
       console.error('Error fetching donations:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchReputation = async () => {
+    if (!user?.id) return
+
+    try {
+      const supabase = createClient()
+      const { data, error: fetchError } = await supabase
+        .from('user_reputation')
+        .select('points, donations_count, reviews_count, badges')
+        .eq('user_id', user.id)
+        .single()
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        // PGRST116 = no rows returned, which is OK for new users
+        throw fetchError
+      }
+
+      if (data) {
+        const reputationData = data as any
+        setReputation({
+          points: reputationData.points || 0,
+          donations_count: reputationData.donations_count || 0,
+          reviews_count: reputationData.reviews_count || 0,
+          badges: (reputationData.badges as Badge[]) || [],
+        })
+      } else {
+        // New user with no reputation data yet
+        setReputation({
+          points: 0,
+          donations_count: 0,
+          reviews_count: 0,
+          badges: [],
+        })
+      }
+    } catch (err: any) {
+      console.error('Error fetching reputation:', err)
     }
   }
 
@@ -140,6 +194,52 @@ export default function PerfilPage() {
   const totalDonated = donations
     .filter((d) => d.status === 'completed')
     .reduce((sum, d) => sum + parseFloat(String(d.amount)), 0)
+
+  // Calculate next badge progress
+  const getNextBadge = () => {
+    if (!reputation) return null
+
+    const { donations_count } = reputation
+
+    if (donations_count < 3) {
+      return {
+        name: 'Apoiador Bronze',
+        icon: '🥉',
+        current: donations_count,
+        target: 3,
+        type: 'donation',
+      }
+    } else if (donations_count < 10) {
+      return {
+        name: 'Apoiador Prata',
+        icon: '🥈',
+        current: donations_count,
+        target: 10,
+        type: 'donation',
+      }
+    } else if (donations_count < 25) {
+      return {
+        name: 'Apoiador Ouro',
+        icon: '🥇',
+        current: donations_count,
+        target: 25,
+        type: 'donation',
+      }
+    } else {
+      return {
+        name: 'Nível Máximo',
+        icon: '👑',
+        current: donations_count,
+        target: donations_count,
+        type: 'complete',
+      }
+    }
+  }
+
+  const nextBadge = getNextBadge()
+  const progress = nextBadge
+    ? (nextBadge.current / nextBadge.target) * 100
+    : 0
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -358,6 +458,74 @@ export default function PerfilPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Reputation Card */}
+            <div className="rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 p-6 shadow">
+              <h3 className="mb-4 text-lg font-semibold text-gray-900">🌟 Reputação</h3>
+
+              {/* Points */}
+              <div className="mb-6 text-center">
+                <p className="text-sm text-gray-600 mb-1">Pontos Totais</p>
+                <p className="text-4xl font-bold text-green-600">
+                  {reputation?.points || 0}
+                </p>
+              </div>
+
+              {/* Badges */}
+              {reputation && reputation.badges.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-sm font-medium text-gray-700 mb-3">Badges Conquistadas</p>
+                  <div className="flex flex-wrap gap-2">
+                    {reputation.badges.map((badge) => (
+                      <div
+                        key={badge.id}
+                        className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 shadow-sm border border-green-100"
+                        title={`Conquistada em ${new Date(badge.earned_at).toLocaleDateString('pt-BR')}`}
+                      >
+                        <span className="text-2xl">{badge.icon}</span>
+                        <span className="text-sm font-medium text-gray-700">{badge.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Next Badge Progress */}
+              {nextBadge && nextBadge.type !== 'complete' && (
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Próxima Badge: {nextBadge.name} {nextBadge.icon}
+                  </p>
+                  <div className="mb-2">
+                    <div className="h-2 w-full rounded-full bg-gray-200">
+                      <div
+                        className="h-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500"
+                        style={{ width: `${Math.min(progress, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-600 text-right">
+                    {nextBadge.current} / {nextBadge.target} doações
+                  </p>
+                </div>
+              )}
+
+              {/* Activity Counts */}
+              <div className="mt-6 pt-6 border-t border-green-100 grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {reputation?.donations_count || 0}
+                  </p>
+                  <p className="text-xs text-gray-600">Doações</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {reputation?.reviews_count || 0}
+                  </p>
+                  <p className="text-xs text-gray-600">Avaliações</p>
+                </div>
+              </div>
+            </div>
+
             {/* Stats Card */}
             <div className="rounded-xl bg-white p-6 shadow">
               <h3 className="mb-4 text-lg font-semibold text-gray-900">Estatísticas</h3>
