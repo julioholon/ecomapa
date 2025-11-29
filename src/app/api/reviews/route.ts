@@ -73,7 +73,6 @@ export async function POST(request: Request) {
           rating,
           comment: comment?.trim() || null,
           visited: visited || false,
-          updated_at: new Date().toISOString(),
         })
         .eq('id', existingReviewData.id)
 
