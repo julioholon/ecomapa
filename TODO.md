@@ -840,11 +840,21 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 
 **Arquivos Criados/Modificados:**
 - `/supabase/migrations/20251128_add_reviews_system.sql` - Campos visited, rating_avg, rating_count, triggers
-- `/supabase/migrations/20251128_update_rpc_with_rating_fields.sql` - RPC function atualizada
+- `/supabase/migrations/20251129_update_rpc_with_rating_fields.sql` - RPC function atualizada
+- `/supabase/migrations/20251201_create_profiles_table.sql` - Tabela pública de perfis
+- `/supabase/migrations/20251202_fix_reviews_user_fk.sql` - FK de reviews para profiles
+- `/supabase/migrations/20251203_add_updated_at_to_reviews.sql` - Coluna updated_at
 - `/src/components/Review/ReviewModal.tsx` - Modal de avaliação completo
 - `/src/components/Ecopoint/DetailModal.tsx` - Botão avaliar + exibição de reviews
 - `/src/app/api/reviews/route.ts` - API endpoint para criar/editar reviews
 - `/src/hooks/useEcopoints.ts` - Adicionado rating_avg e rating_count
+
+**Notas Técnicas:**
+- Criada tabela `profiles` pública para JOIN com reviews (RLS não permite JOIN direto com auth.users)
+- Trigger automático cria profile ao criar usuário
+- Reviews exibem nome do autor via JOIN com profiles
+- Trigger atualiza rating_avg e rating_count automaticamente
+- Edição de review funcional (atualiza existing review ao invés de criar duplicata)
 
 ---
 
@@ -862,11 +872,11 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 - [x] Mostra rating médio (estrelas + número)
 - [ ] Distribuição de estrelas (gráfico barras) - adiado
 - [x] Lista de reviews:
-  - Nome do reviewer (inferido do email ou full_name)
-  - Rating (estrelas)
-  - Comentário
-  - Data formatada (pt-BR)
-  - Badge "Visitou" se checkbox marcado
+  - [x] Nome do reviewer (via profiles.full_name ou email)
+  - [x] Rating (estrelas)
+  - [x] Comentário
+  - [x] Data formatada (pt-BR)
+  - [x] Badge "Visitou" se checkbox marcado
 - [x] Limite de 10 reviews (scroll)
 - [x] Ordenação: Mais recentes primeiro
 - [ ] Botão "Denunciar" (abuse) - adiado
@@ -875,10 +885,13 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 - [x] Reviews carregam corretamente
 - [x] Scroll funciona (max-h-96)
 - [x] UX agradável
+- [x] Nomes de usuários aparecem via JOIN com profiles
 
 **Notas:**
 - Implementado junto com REVIEW-001 no DetailModal
 - Distribuição de estrelas e denúncia adiados para P2
+- JOIN com tabela profiles para exibir nomes dos autores
+- Fallback para "Anônimo" caso perfil não tenha nome
 
 ---
 
@@ -1487,7 +1500,7 @@ const amount_net = amount_gross - platform_fee
 
 ---
 
-**Última atualização:** 2025-11-27 (sistema de doações completo)
+**Última atualização:** 2025-11-29 (sistema de reviews completo)
 **Desenvolvedor:** Julio
 **Contexto:** Vibe Coding com Regen Crypto Commons
 
@@ -1645,14 +1658,13 @@ Depois de testar com sucesso:
 - ✅ P1-AUTH-003 - Perfil do usuário (visualizar, editar nome, trocar senha, histórico doações, reputação)
 - ✅ P1-DONATION-004 - Dashboard de doações recebidas (estatísticas, listagem por ecoponto, totais)
 - ✅ P0-DONATION-005 - Sistema de saque de doações (página + API + emails + migration SQL)
-
-**Próximos (P0 - MVP - CRÍTICO):**
-- 🔴 **P0-REVIEW-001** - Sistema básico de avaliações (ÚLTIMO P0 PENDENTE PARA MVP!)
+- ✅ P1-REVIEW-001 - Sistema de avaliações (modal, API, triggers, reputação)
+- ✅ P1-REVIEW-002 - Listagem de reviews (exibição, profiles JOIN, nomes de autores)
 
 **Próximos (P1 - Post-MVP - ALTA PRIORIDADE):**
-- **P1-NOTIFICATION-001** - Sistema de notificações por email (doações + reviews) ⚠️ CRÍTICO
+- 🟡 **P1-NOTIFICATION-001** - Sistema de notificações por email de reviews ⚠️ IMPORTANTE
+- P1-FILTER-003 - Busca por nome/endereço
 - P1-PHOTO-001 - Upload de fotos de ecopontos
-- P1-REPUTATION-001 - Sistema de reputação completo
 - P2-ADMIN-002 - Dashboard avançado (estatísticas, gráficos, analytics)
 
 ---
@@ -1699,7 +1711,7 @@ gantt
     section Filtros
     Filtro por categoria       :done, filter1, 2024-11-16, 1d
     Filtro por raio            :done, filter2, 2024-11-16, 1d
-    Busca por nome             :filter3, 2024-11-20, 3d
+    Busca por nome             :filter3, 2024-12-10, 3d
 
     section Autenticação
     Login Email/Google         :done, auth1, 2024-11-17, 1d
@@ -1707,26 +1719,34 @@ gantt
     Perfil do usuário          :done, auth3, 2024-11-27, 1d
 
     section Importação
-    Interface Google Maps      :done, import1, 2024-11-17, 1d
-    Categorização manual       :done, import2, 2024-11-17, 1d
-    Salvar como pending        :done, import3, 2024-11-17, 1d
+    Interface Google Maps      :done, import1, 2024-11-17, 2d
+    Categorização manual       :done, import2, 2024-11-19, 1d
+    Salvar como pending        :done, import3, 2024-11-20, 1d
     Email de convite           :done, import4, 2024-11-25, 1d
 
     section Validação
     Landing page               :done, valid1, 2024-11-25, 1d
     Formulário validação       :done, valid2, 2024-11-25, 1d
     Mudança de status          :done, valid3, 2024-11-25, 1d
+    Dashboard administrador    :done, admin1, 2024-11-26, 1d
 
     section Doações
     Integração MercadoPago PIX :done, donation1, 2024-11-25, 1d
-    Modal de doação            :done, donation2, 2024-11-25, 1d
-    Sistema de reputação       :done, donation3, 2024-11-25, 3d
+    Modal de doação            :done, donation2, 2024-11-26, 1d
+    Sistema de reputação       :done, donation3, 2024-11-26, 2d
     Dashboard doações recebidas:done, donation4, 2024-11-27, 1d
     Sistema de saques          :done, donation5, 2024-11-28, 1d
+    Emails de notificação      :done, notif1, 2024-11-27, 1d
 
     section Reviews
-    Adicionar avaliação        :review1, 2024-12-10, 3d
-    Listagem de reviews        :review2, 2024-12-13, 2d
+    Sistema de avaliações      :done, review1, 2024-11-29, 1d
+    Listagem de reviews        :done, review2, 2024-11-29, 1d
+    Tabela profiles            :done, review3, 2024-11-29, 1d
+
+    section Próximas Features
+    Email notificação reviews  :notif2, 2024-12-05, 2d
+    Upload de fotos            :photo1, 2024-12-10, 3d
+    SEO e meta tags            :seo1, 2024-12-15, 2d
 ```
 
 **Legenda:**

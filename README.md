@@ -250,10 +250,18 @@ src/
 │   │   ├── payment-status/           # Polling de status de pagamento
 │   │   ├── webhooks/mercadopago/     # Webhook MercadoPago (confirmação)
 │   │   ├── send-validation-email/    # Enviar email de validação
+│   │   ├── send-donation-email/      # Enviar email de doação recebida
+│   │   ├── reviews/                  # CRUD de avaliações
+│   │   ├── withdrawals/request/      # Solicitar saque de doações
 │   │   └── verify-token/             # Verificar token HMAC
 │   ├── login/        # Autenticação
 │   ├── cadastro/     # Registro de usuários
-│   ├── dashboard/    # Área logada (importar, meus pontos)
+│   ├── dashboard/    # Área logada
+│   │   ├── importar/           # Importar do Google Maps
+│   │   ├── meus-pontos/        # Gerenciar ecopontos
+│   │   ├── perfil/             # Perfil do usuário
+│   │   ├── doacoes/            # Doações recebidas
+│   │   └── solicitar-saque/    # Solicitar saque
 │   ├── auth/         # Callback OAuth
 │   └── validar-ponto/[token]/  # Validação de ecopontos
 ├── components/
@@ -261,6 +269,7 @@ src/
 │   ├── Filters/      # Filtros de categoria e raio
 │   ├── Ecopoint/     # Modal de detalhes
 │   ├── Donation/     # Modal de doação (PIX/Cartão)
+│   ├── Review/       # Modal de avaliação
 │   ├── Auth/         # Rotas protegidas
 │   └── Layout/       # Header, Footer
 ├── contexts/         # React Context (Auth)
@@ -268,7 +277,18 @@ src/
 └── lib/
     ├── supabase/     # Cliente e tipos Supabase
     ├── mercadopago/  # Configuração MercadoPago
+    ├── resend/       # Templates de email (React Email)
     └── constants/    # Categorias e config
+
+supabase/
+├── migrations/       # Migrações do banco de dados
+│   ├── 20241116170001_initial_schema.sql        # Schema inicial
+│   ├── 20251128_add_reviews_system.sql          # Sistema de reviews
+│   ├── 20251129_update_rpc_with_rating_fields.sql  # RPC com ratings
+│   ├── 20251201_create_profiles_table.sql       # Tabela pública de perfis
+│   ├── 20251202_fix_reviews_user_fk.sql         # FK de reviews para profiles
+│   └── 20251203_add_updated_at_to_reviews.sql   # Coluna updated_at
+└── seed/             # Dados de exemplo
 ```
 
 ## Funcionalidades
@@ -287,6 +307,7 @@ src/
 - Sistema de reputação e badges
 - Pontos por doações (+10 pts) e avaliações (+5 pts)
 - Badges: Apoiador Bronze/Prata/Ouro, Explorador
+- Perfil público com histórico de atividades
 
 ### Doações
 - Pagamentos via PIX (QR Code dinâmico)
@@ -294,11 +315,23 @@ src/
 - Valores sugeridos: R$ 5, 10, 20 ou custom (R$ 2-1000)
 - Confirmação automática via webhooks
 - Sistema de reputação integrado
+- Sistema de saques para proprietários (taxa 10%)
+
+### Avaliações (Reviews)
+- Sistema de avaliação com 1 a 5 estrelas
+- Comentários opcionais (até 500 caracteres)
+- Badge "Visitou este local" para reviews verificadas
+- Rating médio atualizado automaticamente
+- Edição de reviews existentes
+- Reputação +5 pontos por avaliação
+- Exibição de nomes dos autores via perfis públicos
 
 ### Administração
 - Importação de lugares do Google Maps
 - Sistema de validação de ecopontos via email
 - Dashboard para gerenciar ecopontos
+- Dashboard de doações recebidas
+- Sistema de solicitação de saques
 - Deploy contínuo no Netlify
 
 ## Contribuição
