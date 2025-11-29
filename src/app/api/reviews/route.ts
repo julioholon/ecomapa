@@ -47,7 +47,9 @@ export async function POST(request: Request) {
       )
     }
 
-    if (ecopoint.status !== 'validated') {
+    const ecopointData = ecopoint as any
+
+    if (ecopointData.status !== 'validated') {
       return NextResponse.json(
         { message: 'Apenas ecopontos validados podem receber avaliações' },
         { status: 400 }
@@ -64,7 +66,8 @@ export async function POST(request: Request) {
 
     if (existingReview) {
       // Update existing review
-      const { error: updateError } = await supabase
+      const existingReviewData = existingReview as any
+      const { error: updateError } = await (supabase as any)
         .from('reviews')
         .update({
           rating,
@@ -72,7 +75,7 @@ export async function POST(request: Request) {
           visited: visited || false,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', existingReview.id)
+        .eq('id', existingReviewData.id)
 
       if (updateError) {
         console.error('Error updating review:', updateError)
@@ -84,11 +87,11 @@ export async function POST(request: Request) {
 
       return NextResponse.json({
         message: 'Avaliação atualizada com sucesso!',
-        review: { id: existingReview.id },
+        review: { id: existingReviewData.id },
       })
     } else {
       // Insert new review
-      const { data: newReview, error: insertError } = await supabase
+      const { data: newReview, error: insertError } = await (supabase as any)
         .from('reviews')
         .insert({
           ecopoint_id,
@@ -109,7 +112,7 @@ export async function POST(request: Request) {
       }
 
       // Update user reputation (+5 points, +1 review)
-      const { error: reputationError } = await supabase.rpc(
+      const { error: reputationError } = await (supabase as any).rpc(
         'increment_user_reputation',
         {
           p_user_id: user.id,
