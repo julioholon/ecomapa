@@ -1,0 +1,96 @@
+name: ✨ Sugerir Feature
+description: Sugira uma nova funcionalidade ou melhoria para o EcoMapa
+title: "[FEATURE] "
+labels: ["enhancement", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por sugerir uma melhoria! Suas ideias são muito importantes para o EcoMapa.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Qual problema você está tentando resolver?
+      description: Descreva a necessidade ou o problema que motivou esta sugestão
+      placeholder: "Exemplo: É difícil saber quais ecopontos estão abertos agora, então não sei qual visitar"
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solução Proposta
+      description: Como você imagina que isso poderia funcionar?
+      placeholder: |
+        Exemplo:
+        - Adicionar um campo "Horário de funcionamento" no cadastro de ecopontos
+        - Mostrar um badge "Aberto agora" nos markers do mapa
+        - Filtro para ver apenas ecopontos abertos
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Categoria
+      description: Que tipo de feature é essa?
+      options:
+        - Mapa e Navegação
+        - Ecopontos (visualização)
+        - Filtros e Busca
+        - Avaliações/Reviews
+        - Doações
+        - Perfil de Usuário
+        - Administração
+        - Importação
+        - Mobile/Responsividade
+        - Acessibilidade
+        - Performance
+        - Outra
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioridade (na sua opinião)
+      description: Quão importante é esta feature?
+      options:
+        - Alta - Muito importante para o uso do app
+        - Média - Seria muito útil ter
+        - Baixa - Nice to have
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas Consideradas
+      description: Você pensou em outras formas de resolver o problema?
+      placeholder: "Exemplo: Pensei em usar integração com Google Places para buscar horários, mas seria mais simples deixar o dono do ecoponto preencher manualmente"
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Exemplos de Referência
+      description: Conhece outros apps que fazem algo similar?
+      placeholder: "Exemplo: O Google Maps mostra 'Aberto' ou 'Fechado' em cada lugar"
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribuição
+      options:
+        - label: Eu tenho interesse em ajudar a implementar esta feature
+          required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: Eu verifiquei que não existe uma sugestão similar já aberta
+          required: true
+        - label: Esta feature está alinhada com os objetivos do EcoMapa (mapeamento colaborativo de iniciativas regenerativas)
+          required: true

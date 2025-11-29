@@ -1,0 +1,118 @@
+name: 🐛 Reportar Bug
+description: Reportar um problema ou comportamento inesperado no EcoMapa
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar um bug! Por favor, preencha as informações abaixo para nos ajudar a entender e corrigir o problema.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição do Bug
+      description: Descreva claramente o que está acontecendo de errado
+      placeholder: "Exemplo: Ao clicar no botão 'Avaliar', o modal não abre e aparece um erro no console"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para Reproduzir
+      description: Como podemos reproduzir este bug?
+      placeholder: |
+        1. Faça login no sistema
+        2. Clique em um ecoponto no mapa
+        3. Clique em "Ver Detalhes"
+        4. Clique no botão "Avaliar"
+        5. Observe o erro
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento Esperado
+      description: O que você esperava que acontecesse?
+      placeholder: "O modal de avaliação deveria abrir normalmente"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamento Atual
+      description: O que está acontecendo atualmente?
+      placeholder: "O modal não abre e aparece um erro 'Cannot read property...' no console"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Navegador
+      description: Qual navegador você está usando?
+      options:
+        - Chrome/Edge
+        - Firefox
+        - Safari
+        - Mobile Safari (iOS)
+        - Chrome Mobile (Android)
+        - Outro
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Dispositivo
+      description: Em qual tipo de dispositivo o problema ocorre?
+      options:
+        - Desktop/Notebook
+        - Smartphone
+        - Tablet
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / Vídeo
+      description: Se possível, adicione screenshots ou vídeo mostrando o problema
+      placeholder: Arraste e solte imagens aqui ou cole URLs
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: Erros do Console
+      description: Se houver erros no console do navegador (F12), cole aqui
+      placeholder: |
+        Exemplo:
+        Uncaught TypeError: Cannot read property 'id' of undefined
+            at fetchReviews (DetailModal.tsx:57)
+      render: shell
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Gravidade
+      description: Quão crítico é este bug?
+      options:
+        - Crítico - O app não funciona
+        - Alto - Funcionalidade importante quebrada
+        - Médio - Funcionalidade menor quebrada
+        - Baixo - Problema visual/cosmético
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: Eu verifiquei que não existe um issue similar já aberto
+          required: true
+        - label: Eu testei no último deploy do Netlify (versão mais recente)
+          required: false

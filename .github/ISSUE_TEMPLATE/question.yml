@@ -1,0 +1,60 @@
+name: ❓ Pergunta / Dúvida
+description: Faça uma pergunta sobre como usar o EcoMapa ou sobre o projeto
+title: "[QUESTION] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tem alguma dúvida sobre o EcoMapa? Estamos aqui para ajudar!
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Categoria da Pergunta
+      description: Sobre o que é sua dúvida?
+      options:
+        - Como usar o app (usuário)
+        - Como adicionar/validar ecopontos
+        - Sobre doações e saques
+        - Sobre avaliações/reviews
+        - Setup técnico / desenvolvimento
+        - Sobre o projeto (visão, roadmap)
+        - Contribuição / como ajudar
+        - Outro
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Sua Pergunta
+      description: Seja o mais específico possível
+      placeholder: |
+        Exemplo:
+        - Como faço para importar ecopontos do Google Maps?
+        - Como funciona o sistema de reputação?
+        - É possível rodar o projeto localmente sem API key do Google?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto Adicional
+      description: Informações extras que possam ajudar a responder sua pergunta
+      placeholder: |
+        Exemplo:
+        - Já tentei procurar na documentação mas não encontrei
+        - Sou proprietário de um ecoponto e quero validá-lo
+        - Sou desenvolvedor e quero contribuir
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: Eu procurei no README.md e no TODO.md antes de perguntar
+          required: false
+        - label: Eu verifiquei se não existe uma issue similar já aberta
+          required: true
