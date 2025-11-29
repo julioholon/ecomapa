@@ -63,7 +63,7 @@ export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
           visited,
           created_at,
           user_id,
-          profiles:user_id (
+          profiles (
             full_name,
             email
           )
