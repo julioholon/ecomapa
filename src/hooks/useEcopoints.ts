@@ -18,6 +18,8 @@ export interface EcopointLocation {
   instagram?: string | null
   facebook?: string | null
   accepts_donations?: boolean
+  rating_avg?: number
+  rating_count?: number
 }
 
 interface EcopointRow {
@@ -66,7 +68,7 @@ export function useEcopoints(): UseEcopointsReturn {
         // Fallback to direct query if RPC doesn't exist
         const { data: fallbackData, error: fallbackError } = await supabase
           .from('ecopoints')
-          .select('id, name, description, email, category, status, location, accepts_donations, phone, website, instagram, facebook, address')
+          .select('id, name, description, email, category, status, location, accepts_donations, phone, website, instagram, facebook, address, rating_avg, rating_count')
           .in('status', ['validated', 'pending'])
           .order('created_at', { ascending: false })
 
@@ -104,6 +106,8 @@ export function useEcopoints(): UseEcopointsReturn {
             instagram: point.instagram,
             facebook: point.facebook,
             address: point.address,
+            rating_avg: point.rating_avg,
+            rating_count: point.rating_count,
           }
         })
 
@@ -141,6 +145,8 @@ export function useEcopoints(): UseEcopointsReturn {
           instagram: point.instagram,
           facebook: point.facebook,
           address: point.address,
+          rating_avg: point.rating_avg,
+          rating_count: point.rating_count,
         }
       })
 

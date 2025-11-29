@@ -810,61 +810,75 @@ Variáveis de ambiente necessárias no Netlify Dashboard:
 ## ÉPICO 8: Sistema de Reviews
 
 ### ⭐ [P1-REVIEW-001] Adicionar avaliação
-**Complexidade:** M  
+**Complexidade:** M
 **Dependências:** AUTH-001, POINT-005
+**Status:** ✅ Completo
 
-**Como** usuário logado  
-**Quero** avaliar um ecoponto  
+**Como** usuário logado
+**Quero** avaliar um ecoponto
 **Para** compartilhar minha experiência
 
 **Critérios de Aceitação:**
-- [ ] Botão "Avaliar" no modal do ecoponto
-- [ ] Modal de review com:
+- [x] Botão "Avaliar" no modal do ecoponto
+- [x] Modal de review com:
   - Seletor de estrelas (1-5)
   - Campo de comentário (opcional, max 500 chars)
   - Checkbox "Visitei este local"
   - Botão "Publicar Avaliação"
-- [ ] Validação: apenas 1 review por usuário/ponto
-- [ ] Se já avaliou: permite editar
-- [ ] Insere em tabela reviews
-- [ ] Atualiza rating médio do ecoponto (trigger)
-- [ ] Reputação +5 pontos ao reviewer
-- [ ] Notificação ao owner do ponto
+- [x] Validação: apenas 1 review por usuário/ponto
+- [x] Se já avaliou: permite editar
+- [x] Insere em tabela reviews
+- [x] Atualiza rating médio do ecoponto (trigger)
+- [x] Reputação +5 pontos ao reviewer
+- [ ] Notificação ao owner do ponto (adiado)
 
 **Definição de Pronto:**
-- Review salva corretamente
-- Rating médio atualiza
-- Duplicatas bloqueadas
-- UX rápida
+- [x] Review salva corretamente
+- [x] Rating médio atualiza
+- [x] Duplicatas bloqueadas
+- [x] UX rápida
+
+**Arquivos Criados/Modificados:**
+- `/supabase/migrations/20251128_add_reviews_system.sql` - Campos visited, rating_avg, rating_count, triggers
+- `/supabase/migrations/20251128_update_rpc_with_rating_fields.sql` - RPC function atualizada
+- `/src/components/Review/ReviewModal.tsx` - Modal de avaliação completo
+- `/src/components/Ecopoint/DetailModal.tsx` - Botão avaliar + exibição de reviews
+- `/src/app/api/reviews/route.ts` - API endpoint para criar/editar reviews
+- `/src/hooks/useEcopoints.ts` - Adicionado rating_avg e rating_count
 
 ---
 
 ### ⭐ [P1-REVIEW-002] Listagem de reviews
-**Complexidade:** S  
+**Complexidade:** S
 **Dependências:** REVIEW-001
+**Status:** ✅ Completo
 
-**Como** usuário  
-**Quero** ver reviews de um ecoponto  
+**Como** usuário
+**Quero** ver reviews de um ecoponto
 **Para** conhecer opiniões de outros
 
 **Critérios de Aceitação:**
-- [ ] Seção "Avaliações" no modal
-- [ ] Mostra rating médio (estrelas + número)
-- [ ] Distribuição de estrelas (gráfico barras)
-- [ ] Lista de reviews:
-  - Avatar e nome do reviewer
+- [x] Seção "Avaliações" no modal
+- [x] Mostra rating médio (estrelas + número)
+- [ ] Distribuição de estrelas (gráfico barras) - adiado
+- [x] Lista de reviews:
+  - Nome do reviewer (inferido do email ou full_name)
   - Rating (estrelas)
   - Comentário
-  - Data relativa ("2 dias atrás")
+  - Data formatada (pt-BR)
   - Badge "Visitou" se checkbox marcado
-- [ ] Paginação ou scroll infinito
-- [ ] Ordenação: Mais recentes / Mais úteis
-- [ ] Botão "Denunciar" (abuse)
+- [x] Limite de 10 reviews (scroll)
+- [x] Ordenação: Mais recentes primeiro
+- [ ] Botão "Denunciar" (abuse) - adiado
 
 **Definição de Pronto:**
-- Reviews carregam corretamente
-- Paginação funciona
-- UX agradável
+- [x] Reviews carregam corretamente
+- [x] Scroll funciona (max-h-96)
+- [x] UX agradável
+
+**Notas:**
+- Implementado junto com REVIEW-001 no DetailModal
+- Distribuição de estrelas e denúncia adiados para P2
 
 ---
 

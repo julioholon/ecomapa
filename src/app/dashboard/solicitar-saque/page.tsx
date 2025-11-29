@@ -227,6 +227,15 @@ export default function SolicitarSaquePage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Voltar para o mapa
+          </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-8">
             💸 Solicitar Saque
           </h1>
@@ -255,6 +264,15 @@ export default function SolicitarSaquePage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-8">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Voltar para o mapa
+          </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             💸 Solicitar Saque
           </h1>

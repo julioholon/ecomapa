@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react'
 import { EcopointLocation } from '@/hooks/useEcopoints'
 import { getPrimaryCategory, CATEGORY_MAP } from '@/lib/constants/categories'
 import DonationModal from '@/components/Donation/DonationModal'
+import ReviewModal from '@/components/Review/ReviewModal'
+import { useAuth } from '@/contexts/AuthContext'
+import { createClient } from '@/lib/supabase/client'
 
 interface DetailModalProps {
   ecopoint: EcopointLocation | null
@@ -11,7 +14,11 @@ interface DetailModalProps {
 }
 
 export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
+  const { user } = useAuth()
   const [showDonationModal, setShowDonationModal] = useState(false)
+  const [showReviewModal, setShowReviewModal] = useState(false)
+  const [reviews, setReviews] = useState<any[]>([])
+  const [loadingReviews, setLoadingReviews] = useState(true)
 
   // Close on ESC key
   useEffect(() => {
@@ -31,6 +38,52 @@ export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
       document.body.style.overflow = 'unset'
     }
   }, [ecopoint])
+
+  // Fetch reviews
+  useEffect(() => {
+    if (ecopoint) {
+      fetchReviews()
+    }
+  }, [ecopoint])
+
+  const fetchReviews = async () => {
+    if (!ecopoint) return
+
+    setLoadingReviews(true)
+    try {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('reviews')
+        .select(`
+          id,
+          rating,
+          comment,
+          visited,
+          created_at,
+          user:user_id (
+            full_name,
+            email
+          )
+        `)
+        .eq('ecopoint_id', ecopoint.id)
+        .order('created_at', { ascending: false })
+        .limit(10)
+
+      if (error) {
+        console.error('Error fetching reviews:', error)
+      } else {
+        setReviews((data as any) || [])
+      }
+    } catch (err) {
+      console.error('Error fetching reviews:', err)
+    } finally {
+      setLoadingReviews(false)
+    }
+  }
+
+  const handleReviewSuccess = () => {
+    fetchReviews()
+  }
 
   if (!ecopoint) return null
 
@@ -281,6 +334,73 @@ export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
             </p>
           </div>
 
+          {/* Reviews Section */}
+          {ecopoint.status === 'validated' && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-gray-900">Avaliações</h3>
+                {(ecopoint as any).rating_count > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">⭐</span>
+                    <span className="text-lg font-bold text-gray-900">
+                      {((ecopoint as any).rating_avg || 0).toFixed(1)}
+                    </span>
+                    <span className="text-sm text-gray-600">
+                      ({(ecopoint as any).rating_count} {(ecopoint as any).rating_count === 1 ? 'avaliação' : 'avaliações'})
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {loadingReviews ? (
+                <div className="py-8 text-center">
+                  <div className="mx-auto h-6 w-6 animate-spin rounded-full border-3 border-gray-200 border-t-green-600"></div>
+                </div>
+              ) : reviews.length > 0 ? (
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {reviews.map((review: any) => (
+                    <div key={review.id} className="rounded-lg border border-gray-200 bg-white p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <span key={star} className="text-lg">
+                                {star <= review.rating ? '⭐' : '☆'}
+                              </span>
+                            ))}
+                          </div>
+                          {review.visited && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                              ✓ Visitado
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-500">
+                          {new Date(review.created_at).toLocaleDateString('pt-BR')}
+                        </span>
+                      </div>
+
+                      {review.comment && (
+                        <p className="text-sm text-gray-700 mb-2">{review.comment}</p>
+                      )}
+
+                      <p className="text-xs text-gray-500">
+                        Por {review.user?.full_name || review.user?.email?.split('@')[0] || 'Anônimo'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+                  <p className="text-sm text-gray-600">
+                    Ainda não há avaliações para este ecoponto.
+                    {user && ' Seja o primeiro a avaliar!'}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div className="flex flex-col gap-3 sm:flex-row">
             <button
@@ -314,6 +434,15 @@ export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
               Compartilhar
             </button>
 
+            {ecopoint.status === 'validated' && user && (
+              <button
+                onClick={() => setShowReviewModal(true)}
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 font-medium text-gray-700 hover:bg-gray-50"
+              >
+                ⭐ Avaliar
+              </button>
+            )}
+
             {ecopoint.status === 'validated' && ecopoint.accepts_donations && (
               <button
                 onClick={() => setShowDonationModal(true)}
@@ -343,6 +472,17 @@ export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
         }}
         isOpen={showDonationModal}
         onClose={() => setShowDonationModal(false)}
+      />
+
+      {/* Review Modal */}
+      <ReviewModal
+        ecopoint={{
+          id: ecopoint.id,
+          name: ecopoint.name,
+        }}
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        onSuccess={handleReviewSuccess}
       />
     </div>
   )
