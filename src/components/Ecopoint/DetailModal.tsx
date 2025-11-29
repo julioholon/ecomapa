@@ -52,7 +52,9 @@ export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
     setLoadingReviews(true)
     try {
       const supabase = createClient()
-      const { data, error } = await supabase
+
+      // Fetch reviews with user profiles
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
         .select(`
           id,
@@ -60,7 +62,8 @@ export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
           comment,
           visited,
           created_at,
-          user:user_id (
+          user_id,
+          profiles:user_id (
             full_name,
             email
           )
@@ -69,13 +72,25 @@ export default function DetailModal({ ecopoint, onClose }: DetailModalProps) {
         .order('created_at', { ascending: false })
         .limit(10)
 
-      if (error) {
-        console.error('Error fetching reviews:', error)
-      } else {
-        setReviews((data as any) || [])
+      if (reviewsError) {
+        console.error('Error fetching reviews:', reviewsError)
+        setReviews([])
+        return
       }
+
+      // Map reviews to use the correct user data structure
+      const reviewsWithUsers = (reviewsData as any[] || []).map((review) => ({
+        ...review,
+        user: review.profiles || {
+          full_name: null,
+          email: null,
+        }
+      }))
+
+      setReviews(reviewsWithUsers)
     } catch (err) {
       console.error('Error fetching reviews:', err)
+      setReviews([])
     } finally {
       setLoadingReviews(false)
     }
